@@ -1,77 +1,115 @@
 package com.tregouet.subseq_finder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
 public class Subseq {
 
-	private static final String VALUE_PLACEHOLDER = "_";
-	private static final String SEQ_START = "START";
-	private static final String SEQ_END = "END";
+	public static final String ARG_PLACEHOLDER = "_";
+	public static final String SEQ_START = "START";
+	public static final String SEQ_END = "END";
 	
-	int[][] dotCoordinates;
-	int dotCoordIndex = 0;
-	List<List<Integer>> Value1ArgumentsCoord = new ArrayList<List<Integer>>();
-	List<List<Integer>> Value2ArgumentsCoord = new ArrayList<List<Integer>>();
+	private final int[][] coordinates;
+	private int coordIndex;
+	private final List<List<Integer>> value1ArgumentsCoords;
+	private final List<List<Integer>> value2ArgumentsCoords;
 	
 	public Subseq(int seqMaxSize) {
-		dotCoordinates = new int[seqMaxSize][2];
+		coordIndex = 0;
+		coordinates = new int[seqMaxSize][2];
+		for (int i=0 ; i<coordinates.length ; i++) {
+			coordinates[i][1] = -1;
+			coordinates[i][2] = -1;
+		}
+		value1ArgumentsCoords = new ArrayList<List<Integer>>();
+		value2ArgumentsCoords = new ArrayList<List<Integer>>();
 	}
 	
-	public void setNewCoordinates(int firstCoord, int secCoord) throws SubseqException {
-		if (dotCoordIndex < dotCoordinates.length - 1) {
-			dotCoordinates[dotCoordIndex][1] = firstCoord;
-			dotCoordinates[dotCoordIndex][2] = secCoord;
-			dotCoordIndex++;
+	public Subseq(int[][] dotCoordinates, int dotCoordIndex, List<List<Integer>> value1ArgumentsCoords, 
+			List<List<Integer>> value2ArgumentsCoords) {
+		this.coordinates = Arrays.copyOf(dotCoordinates, dotCoordinates.length);
+		this.coordIndex = dotCoordIndex;
+		this.value1ArgumentsCoords = new ArrayList<List<Integer>>(value1ArgumentsCoords);
+		this.value2ArgumentsCoords = new ArrayList<List<Integer>>(value2ArgumentsCoords);
+	}
+	
+	public void addNewCoord(int val1NewCoord, int val2NewCoord) throws SubseqException {
+		if (coordIndex < coordinates.length - 1) {
+			if (coordIndex > 0) {
+				int val1LastCoord = coordinates[coordIndex - 1][1];
+				int val2LastCoord = coordinates[coordIndex - 1][2];
+				if ((val1NewCoord > val1LastCoord + 1) || (val2NewCoord > val2LastCoord +1)) {
+					List<Integer> val1ArgCoords = new ArrayList<Integer>();
+					List<Integer> val2ArgCoords = new ArrayList<Integer>();
+					for (int val1ArgCoord = val1LastCoord + 1 ; val1ArgCoord < val1NewCoord ; val1ArgCoord++)
+						val1ArgCoords.add(val1ArgCoord);
+					for (int val2ArgCoord = val2LastCoord + 1 ; val2ArgCoord < val2NewCoord ; val2ArgCoord++)
+						val2ArgCoords.add(val2ArgCoord);
+					value1ArgumentsCoords.add(val1ArgCoords);
+					value2ArgumentsCoords.add(val2ArgCoords);
+				}
+			}
+			coordinates[coordIndex][1] = val1NewCoord;
+			coordinates[coordIndex][2] = val2NewCoord;
+			coordIndex++;
 		}
 		else throw new SubseqException("SubSeq.setNewCoordinates() : coordinates array is already full");
 	}
 	
-	public List<String> getSequence(String[] first, String[] second) {
+	public List<String> getSequence(String[] value, int valueNumber) throws SubseqException {
 		List<String> sequence = new ArrayList<String>();
-		int lastVal1Pos = 0;
-		int lastVal2Pos = 0;
-		for (int i=0 ; i < dotCoordinates.length ; i++) {
-			int currVal1Pos = dotCoordinates[i][1];
-			int currVal2Pos = dotCoordinates[i][2];
-			if ((currVal1Pos > lastVal1Pos + 1) || (currVal2Pos > lastVal2Pos + 1)) {
-				sequence.add(VALUE_PLACEHOLDER);
-				List<Integer> val1ArgCoord = new ArrayList<Integer>();
-				List<Integer> val2ArgCoord = new ArrayList<Integer>();
-				for (int val1ArgIdx = lastVal1Pos ; val1ArgIdx < currVal1Pos - 1 ; val1ArgIdx++) {
-					val1ArgCoord.add(val1ArgIdx);
+		if ((valueNumber > 0) && (valueNumber < 3)) {
+			int lastVal1Pos = -1;
+			int lastVal2Pos = -1;
+			int idx = 0;
+			while (coordinates[idx][1] != -1) {
+				int currVal1Pos = coordinates[idx][1];
+				int currVal2Pos = coordinates[idx][2];
+				if ((currVal1Pos > lastVal1Pos + 1) || (currVal2Pos > lastVal2Pos + 1)) {
+					sequence.add(ARG_PLACEHOLDER);
 				}
-				for (int val2ArgIdx = lastVal2Pos ; val2ArgIdx < currVal2Pos - 1 ; val2ArgIdx++) {
-					val2ArgCoord.add(val2ArgIdx);
-				}
-				Value1ArgumentsCoord.add(val1ArgCoord);
-				Value2ArgumentsCoord.add(val2ArgCoord);
+				sequence.add(value[coordinates[idx][valueNumber]]);
+				lastVal1Pos = currVal1Pos;
+				lastVal2Pos = currVal2Pos;
+				idx++;
 			}
-			sequence.add(first[currVal1Pos]);
-			lastVal1Pos = currVal1Pos;
-			lastVal2Pos = currVal2Pos;
 		}
+		else throw new SubseqException("Subseq.getSequence() : invalid value number");
 		return sequence;
 	}
 	
-	public List<List<String>> getValueArguments(String[] value1, int valueNumber) throws SubseqException{
-		List<List<String>> arguments;
+	public Set<Integer> getValueCoordinates(int valueNumber) throws SubseqException {
+		Set<Integer> valCoordinates;
 		if (valueNumber > 0 && valueNumber < 3) {
-			arguments = new ArrayList<List<String>>();
-			List<String> currentArgument;
-			int dotCoordinatesIndex = 0;
-			int lastFirstValCoord = 0;
-			int lastSecValCoord = 0; 
-			
+			valCoordinates = new HashSet<Integer>();
+			int idx = 0;
+			while (coordinates[idx][1] != -1) {
+				valCoordinates.add(coordinates[idx][valueNumber]);
+				idx++;
+			}
 		}
-		else throw new SubseqException("Subseq.getValueArguments() : value number invalid");
-		return arguments;
+		else throw new SubseqException("Subseq.getValueCoordinates() : value number is invalid");
+		return valCoordinates;		
 	}
 	
-	public List<String> getTrimmedSequence(String[] first, String[] second) throws SubseqException {
-		List<String> sequence = getSequence(first, second);
+	public List<List<Integer>> getValueArgsCoordinates(int valueNumber) throws SubseqException{
+		List<List<Integer>> valueArgsCoordinates;
+		if (valueNumber > 0 && valueNumber < 3) {
+			if (valueNumber == 1)
+				valueArgsCoordinates = value1ArgumentsCoords;
+			else valueArgsCoordinates = value2ArgumentsCoords;
+		}
+		else throw new SubseqException("Subseq.getValueArgsCoordinates() : invalid value number");
+		return valueArgsCoordinates;
+	}
+	
+	public List<String> getTrimmedSequence(String[] value, int valueNumber) throws SubseqException {
+		List<String> sequence = getSequence(value, valueNumber);
 		if (sequence != null && !sequence.isEmpty()) {
 			if (!sequence.get(0).equals(SEQ_START))
 				throw new SubseqException("Subseq.getTrimmedSequence() : first value invalid");
@@ -83,6 +121,26 @@ public class Subseq {
 		}
 		else throw new SubseqException("Subseq.getTrimmedSequence() : sequence is null or empty");
 		return sequence;
+	}
+	
+	public boolean isASubseqOf(Subseq subseq) throws SubseqException {
+		boolean isASubSeqOf;
+		try {
+			if ((subseq.getValueCoordinates(1).containsAll(this.getValueCoordinates(1))
+					|| subseq.getValueCoordinates(2).containsAll(this.getValueCoordinates(2))))
+				isASubSeqOf = true;
+			else isASubSeqOf = false;	
+		}
+		catch (SubseqException e) {
+			throw new SubseqException("Subseq.isASubseqOf() : " + System.lineSeparator() + e.getMessage());
+		}
+		return isASubSeqOf;
+	}
+	
+	@Override
+	public Subseq clone() {
+		Subseq subseqClone = new Subseq(coordinates, coordIndex, value1ArgumentsCoords, value2ArgumentsCoords);
+		return subseqClone;
 	}
 
 }
