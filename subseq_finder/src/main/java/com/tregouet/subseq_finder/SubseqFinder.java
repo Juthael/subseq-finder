@@ -23,12 +23,12 @@ public class SubseqFinder {
 		System.arraycopy(second, 0, this.second, 1, second.length);
 		dotPlot = new boolean[first.length + 2][second.length + 2];
 		for (int f=0 ; f < this.first.length ; f++) {
-			for (int s=0 ; s < this.second.length ; s++) {
+			for (int s=0 ; s < this.second.length ; s++) { 
 				if (this.first[f].equals(this.second[s]))
 					dotPlot[f][s] = true;
 			}
 		}
 	}
 	
-	private int[][] returnPartialSubseq
+	private int[][] returnPartialSubseqtest
 }
