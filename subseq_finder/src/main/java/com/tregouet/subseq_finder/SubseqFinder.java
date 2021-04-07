@@ -9,36 +9,46 @@ import com.tregouet.subseq_finder.exceptions.SubseqException;
 
 public class SubseqFinder {
 
+	private final String[] value0;
 	private final String[] value1;
-	private final String[] value2;
 	private final boolean[][] dotPlot;
 	private final Set<Subseq> subseqs = new HashSet<Subseq>();
 	
-	public SubseqFinder(String[] first, String[] second) throws SubseqException {
-		this.value1 = new String[first.length + 2];
-		this.value2 = new String[second.length + 2];
+	public SubseqFinder(String[] value0, String[] value1) throws SubseqException {
+		this.value0 = new String[value0.length + 2];
+		this.value1 = new String[value1.length + 2];
+		this.value0[0] = "START";
 		this.value1[0] = "START";
-		this.value2[0] = "START";
+		this.value0[this.value0.length - 1] = "END";
 		this.value1[this.value1.length - 1] = "END";
-		this.value2[this.value2.length - 1] = "END";
-		System.arraycopy(first, 0, this.value1, 1, first.length);
-		System.arraycopy(second, 0, this.value2, 1, second.length);
-		dotPlot = new boolean[first.length + 2][second.length + 2];
-		for (int f=0 ; f < this.value1.length ; f++) {
-			for (int s=0 ; s < this.value2.length ; s++) { 
-				if (this.value1[f].equals(this.value2[s]))
+		System.arraycopy(value0, 0, this.value0, 1, value0.length);
+		System.arraycopy(value1, 0, this.value1, 1, value1.length);
+		dotPlot = new boolean[value0.length + 2][value1.length + 2];
+		for (int f=0 ; f < this.value0.length ; f++) {
+			for (int s=0 ; s < this.value1.length ; s++) { 
+				if (this.value0[f].equals(this.value1[s]))
 					dotPlot[f][s] = true;
 			}
 		}
 		setSubseqs();
 	}
 	
+	public Set<Subseq> getSubseqs(){
+		return subseqs;
+	}
+	
+	public void printSubsetStrings() throws SubseqException {
+		for (Subseq subseq : subseqs) {
+			System.out.println(subseq.getSequence(value0, 0));
+		}
+	}
+	
 	private void setSubseqs() throws SubseqException {
 		List<Subseq> allSubseqs = new ArrayList<Subseq>();
-		int seqMaxSize = value1.length;
-		if (value1.length > value2.length)
-			seqMaxSize = value1.length;
-		else seqMaxSize = value2.length;
+		int seqMaxSize;
+		if (value0.length < value1.length)
+			seqMaxSize = value0.length;
+		else seqMaxSize = value1.length;
 		if (dotPlot != null && dotPlot[0][0] == true) {
 			Subseq newSeq = new Subseq(seqMaxSize);
 			try {
@@ -50,9 +60,9 @@ public class SubseqFinder {
 		}
 		else throw new SubseqException("SubseqFinder.setSubseqs() : initial dotPlot values are invalid");
 		Set<Integer> nonMaxIndexes = new HashSet<Integer>();
-		for (int i = 0; i < subseqs.size() ; i++) {
+		for (int i = 0; i < allSubseqs.size() ; i++) {
 			if (!nonMaxIndexes.contains(i)) {
-				for (int j=i+1 ; j < subseqs.size() ; j++) {
+				for (int j=i+1 ; j < allSubseqs.size() ; j++) {
 					if (!nonMaxIndexes.contains(j)) {
 						if (allSubseqs.get(i).isASubseqOf(allSubseqs.get(j))) {
 							nonMaxIndexes.add(i);
@@ -70,33 +80,41 @@ public class SubseqFinder {
 		}
 	}
 	
-	private Set<Subseq> continueSubseq(Subseq currentSubseq, int newElemVal1Coord, int newElemVal2Coord) throws SubseqException {
+	private Set<Subseq> continueSubseq(Subseq currentSubseq, int newElemVal0Coord, int newElemVal1Coord) throws SubseqException {
 		Set<Subseq> subSequences = new HashSet<Subseq>();
 		Subseq currSubseq = currentSubseq.clone();
 		try {
-			currSubseq.addNewCoord(newElemVal1Coord, newElemVal2Coord);
+			currSubseq.addNewCoord(newElemVal0Coord, newElemVal1Coord);
 		}
 		catch (SubseqException e) {
 			throw new SubseqException("SubseqFinder.continueSubseq() : " + System.lineSeparator() + e.getMessage());
 		}
-		boolean nextElemFound = false;
-		for (int nextElemVal1Coord = newElemVal1Coord + 1 ; nextElemVal1Coord < dotPlot.length ; nextElemVal1Coord++) {
-			for (int nextElemVal2Coord = newElemVal2Coord + 1 ; nextElemVal2Coord < dotPlot[nextElemVal1Coord].length ; 
-					nextElemVal2Coord++) {
-				if (dotPlot[nextElemVal1Coord][nextElemVal2Coord] == true) {
-					nextElemFound = true;
-					try {
-						subSequences.addAll(continueSubseq(currSubseq, nextElemVal1Coord, nextElemVal2Coord));
-					}
-					catch (SubseqException e) {
-						throw new SubseqException("SubseqFinder.continueSubseq() : " + System.lineSeparator() 
-						+ e.getMessage());
+		if ((dotPlot.length < newElemVal0Coord + 1) 
+				&& (dotPlot[newElemVal0Coord].length < newElemVal1Coord + 1)
+				&& (dotPlot[newElemVal0Coord +1][newElemVal1Coord + 1] == true)) {
+			subSequences.addAll(continueSubseq(currSubseq, newElemVal0Coord +1, newElemVal1Coord +1));
+		}
+		else {
+			boolean nextElemFound = false;
+			for (int nextElemVal0Coord = newElemVal0Coord + 1 ; nextElemVal0Coord < dotPlot.length ; nextElemVal0Coord++) {
+				for (int nextElemVal1Coord = newElemVal1Coord + 1 ; nextElemVal1Coord < dotPlot[nextElemVal0Coord].length ; 
+						nextElemVal1Coord++) {
+					if (dotPlot[nextElemVal0Coord][nextElemVal1Coord] == true) {
+						nextElemFound = true;
+						try {
+							subSequences.addAll(continueSubseq(currSubseq, nextElemVal0Coord, nextElemVal1Coord));
+						}
+						catch (SubseqException e) {
+							throw new SubseqException("SubseqFinder.continueSubseq() : " + System.lineSeparator() 
+							+ e.getMessage());
+						}
 					}
 				}
 			}
+			if (!nextElemFound) {
+				subSequences.add(currSubseq);
+			}
 		}
-		if (!nextElemFound)
-			subSequences.add(currSubseq);
 		return subSequences;
 	}
 }
