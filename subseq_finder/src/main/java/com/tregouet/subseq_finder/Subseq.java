@@ -13,10 +13,16 @@ public class Subseq implements Cloneable {
 	public static final String SEQ_START = "START";
 	public static final String SEQ_END = "END";
 	
+	/**
+	 * If coordinates[x][n] == y and y != -1, then the x^th symbol (starting from 0) in the subsequence is the y^th symbol 
+	 * in the n^th sequence. If y == -1, then there is no x^th symbol and the n^th sequence length is < x. 
+	 */
 	private final int[][] coordinates;
+	
+	/**
+	 * If coordIndex == x, then the next symbol added to the subsequence will be the x^th. 
+	 */
 	private int coordIndex;
-	private final List<List<Integer>> value0ArgumentsCoords;
-	private final List<List<Integer>> value1ArgumentsCoords;
 	
 	public Subseq(int seqMaxSize) {
 		coordIndex = 0;
@@ -25,12 +31,9 @@ public class Subseq implements Cloneable {
 			coordinates[i][0] = -1;
 			coordinates[i][1] = -1;
 		}
-		value0ArgumentsCoords = new ArrayList<List<Integer>>();
-		value1ArgumentsCoords = new ArrayList<List<Integer>>();
 	}
 	
-	public Subseq(int[][] dotCoordinates, int dotCoordIndex, List<List<Integer>> value1ArgumentsCoords, 
-			List<List<Integer>> value2ArgumentsCoords) {
+	public Subseq(int[][] dotCoordinates, int dotCoordIndex) {
 		this.coordinates = new int[dotCoordinates.length][];
 		for (int i = 0 ; i < dotCoordinates.length ; i++) {
 			this.coordinates[i] = new int[dotCoordinates[i].length];
@@ -39,26 +42,10 @@ public class Subseq implements Cloneable {
 			}
 		}
 		this.coordIndex = dotCoordIndex;
-		this.value0ArgumentsCoords = new ArrayList<List<Integer>>(value1ArgumentsCoords);
-		this.value1ArgumentsCoords = new ArrayList<List<Integer>>(value2ArgumentsCoords);
 	}
 	
 	public void addNewCoord(int val0NewCoord, int val1NewCoord) throws SubseqException {
 		if (coordIndex < coordinates.length - 1) {
-			if (coordIndex > 0) {
-				int val0LastCoord = coordinates[coordIndex - 1][0];
-				int val1LastCoord = coordinates[coordIndex - 1][1];
-				if ((val0NewCoord > val0LastCoord + 1) || (val1NewCoord > val1LastCoord +1)) {
-					List<Integer> val0ArgCoords = new ArrayList<Integer>();
-					List<Integer> val1ArgCoords = new ArrayList<Integer>();
-					for (int val0ArgCoord = val0LastCoord + 1 ; val0ArgCoord < val0NewCoord ; val0ArgCoord++)
-						val0ArgCoords.add(val0ArgCoord);
-					for (int val1ArgCoord = val1LastCoord + 1 ; val1ArgCoord < val1NewCoord ; val1ArgCoord++)
-						val1ArgCoords.add(val1ArgCoord);
-					value0ArgumentsCoords.add(val0ArgCoords);
-					value1ArgumentsCoords.add(val1ArgCoords);
-				}
-			}
 			coordinates[coordIndex][0] = val0NewCoord;
 			coordinates[coordIndex][1] = val1NewCoord;
 			coordIndex++;
@@ -76,6 +63,7 @@ public class Subseq implements Cloneable {
 				int currVal0Pos = coordinates[idx][0];
 				int currVal1Pos = coordinates[idx][1];
 				if ((currVal0Pos > lastVal0Pos + 1) || (currVal1Pos > lastVal1Pos + 1)) {
+					//if the common subsequences pass some letters of the value, then a placeholder is added
 					sequence.add(ARG_PLACEHOLDER);
 				}
 				sequence.add(value[coordinates[idx][valueNumber]]);
@@ -88,6 +76,12 @@ public class Subseq implements Cloneable {
 		return sequence;
 	}
 	
+	/**
+	 * 
+	 * @param valueNumber
+	 * @return the position of the subsequence symbols in the value
+	 * @throws SubseqException
+	 */
 	public Set<Integer> getValueCoordinates(int valueNumber) throws SubseqException {
 		Set<Integer> valCoordinates;
 		if (valueNumber > -1 && valueNumber < 2) {
@@ -102,17 +96,6 @@ public class Subseq implements Cloneable {
 		return valCoordinates;		
 	}
 	
-	public List<List<Integer>> getValueArgsCoordinates(int valueNumber) throws SubseqException{
-		List<List<Integer>> valueArgsCoordinates;
-		if (valueNumber > -1 && valueNumber < 2) {
-			if (valueNumber == 0)
-				valueArgsCoordinates = value0ArgumentsCoords;
-			else valueArgsCoordinates = value1ArgumentsCoords;
-		}
-		else throw new SubseqException("Subseq.getValueArgsCoordinates() : invalid value number");
-		return valueArgsCoordinates;
-	}
-	
 	public List<String> getTrimmedSequence(String[] value, int valueNumber) throws SubseqException {
 		List<String> sequence = getSequence(value, valueNumber);
 		if (valueNumber > -1 && valueNumber < 2) {
@@ -123,6 +106,7 @@ public class Subseq implements Cloneable {
 					sequence.remove(0);
 					if (sequence.get(sequence.size() - 1).equals(SEQ_END))
 						sequence.remove(sequence.size() - 1);
+					//sinon erreur, non ?
 				}
 			}
 			else throw new SubseqException("Subseq.getTrimmedSequence() : sequence is null or empty");
@@ -147,7 +131,7 @@ public class Subseq implements Cloneable {
 	
 	@Override
 	public Subseq clone() {
-		Subseq subseqClone = new Subseq(coordinates, coordIndex, value0ArgumentsCoords, value1ArgumentsCoords);
+		Subseq subseqClone = new Subseq(coordinates, coordIndex);
 		return subseqClone;
 	}
 

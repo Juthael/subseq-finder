@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
-public class SubseqFinderTest {
+public class SubseqFinderDeprecTest {
 
 	@Before
 	public void setUp() throws Exception {
@@ -19,7 +19,7 @@ public class SubseqFinderTest {
 	public void whenSubseqsRequestedThenSupplied() throws SubseqException {
 		String[] array1 = {"a", "b", "c", "b", "d", "b"};
 		String[] array2 = {"a", "c", "b", "c", "d", "b"};
-		SubseqFinder finder = new SubseqFinder(array1, array2);
+		SubseqFinderDeprec finder = new SubseqFinderDeprec(array1, array2);
 		Set<Subseq> returned = finder.getSubseqs(); 
 		finder.printSubsetStrings();
 		assertTrue(!returned.isEmpty());

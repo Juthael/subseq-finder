@@ -7,14 +7,22 @@ import java.util.Set;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
-public class SubseqFinder {
+public class SubseqFinderDeprec {
 
+	// first string of symbols. First symbol is "START", last one is "END".
 	private final String[] value0;
+	
+	// second string of symbols. First symbol is "START", last one is "END".
 	private final String[] value1;
+	
+	
+	// dotPlot[x][y] == true if value[0].equals(value[1]);
 	private final boolean[][] dotPlot;
+	
+	// all subsequences found
 	private final Set<Subseq> subseqs = new HashSet<Subseq>();
 	
-	public SubseqFinder(String[] value0, String[] value1) throws SubseqException {
+	public SubseqFinderDeprec(String[] value0, String[] value1) throws SubseqException {
 		this.value0 = new String[value0.length + 2];
 		this.value1 = new String[value1.length + 2];
 		this.value0[0] = "START";
@@ -45,20 +53,22 @@ public class SubseqFinder {
 	
 	private void setSubseqs() throws SubseqException {
 		List<Subseq> allSubseqs = new ArrayList<Subseq>();
+		//a subsequence can't be longer than the shortest sequence
 		int seqMaxSize;
 		if (value0.length < value1.length)
 			seqMaxSize = value0.length;
 		else seqMaxSize = value1.length;
+		//initial value of the array must be START
 		if (dotPlot != null && dotPlot[0][0] == true) {
 			Subseq newSeq = new Subseq(seqMaxSize);
 			try {
 				allSubseqs.addAll(continueSubseq(newSeq, 0, 0));
 			}
 			catch (SubseqException e) {
-				throw new SubseqException("SubseqFinder.setSubseqs() : " + System.lineSeparator() + e.getMessage());
+				throw new SubseqException("SubseqFinderDeprec.setSubseqs() : " + System.lineSeparator() + e.getMessage());
 			}
 		}
-		else throw new SubseqException("SubseqFinder.setSubseqs() : initial dotPlot values are invalid");
+		else throw new SubseqException("SubseqFinderDeprec.setSubseqs() : initial dotPlot values are invalid");
 		Set<Integer> nonMaxIndexes = new HashSet<Integer>();
 		for (int i = 0; i < allSubseqs.size() ; i++) {
 			if (!nonMaxIndexes.contains(i)) {
@@ -87,7 +97,7 @@ public class SubseqFinder {
 			currSubseq.addNewCoord(newElemVal0Coord, newElemVal1Coord);
 		}
 		catch (SubseqException e) {
-			throw new SubseqException("SubseqFinder.continueSubseq() : " + System.lineSeparator() + e.getMessage());
+			throw new SubseqException("SubseqFinderDeprec.continueSubseq() : " + System.lineSeparator() + e.getMessage());
 		}
 		if ((dotPlot.length < newElemVal0Coord + 1) 
 				&& (dotPlot[newElemVal0Coord].length < newElemVal1Coord + 1)
@@ -105,7 +115,7 @@ public class SubseqFinder {
 							subSequences.addAll(continueSubseq(currSubseq, nextElemVal0Coord, nextElemVal1Coord));
 						}
 						catch (SubseqException e) {
-							throw new SubseqException("SubseqFinder.continueSubseq() : " + System.lineSeparator() 
+							throw new SubseqException("SubseqFinderDeprec.continueSubseq() : " + System.lineSeparator() 
 							+ e.getMessage());
 						}
 					}
