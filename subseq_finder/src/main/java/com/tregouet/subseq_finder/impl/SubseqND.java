@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
 import com.tregouet.subseq_finder.ISubseqND;
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
@@ -21,6 +19,7 @@ public class SubseqND implements ISubseqND {
 	private final int nbOfSequences;
 	private final int[][] coords;
 	private int coordIndex;
+	private final List<Set<Integer>> subsetPositionsInSequences;
 	
 	public SubseqND(int subSeqMaxSize, int nbOfSequences) {
 		this.subseqMaxSize = subSeqMaxSize;
@@ -29,6 +28,10 @@ public class SubseqND implements ISubseqND {
 		for (int[] coordinate : coords)
 			Arrays.fill(coordinate, -1);
 		coordIndex = 0;
+		subsetPositionsInSequences = new ArrayList<Set<Integer>>();
+		for (int i=0 ; i < nbOfSequences ; i++) {
+			subsetPositionsInSequences.add(new HashSet<Integer>());
+		}
 	}
 
 	public void addNewCoord(int[] newCoord) throws SubseqException {
@@ -43,22 +46,43 @@ public class SubseqND implements ISubseqND {
 					+ "should contain "	+ Integer.toString(nbOfSequences) + " values instead of " 
 					+ Integer.toString(newCoord.length) + ".");
 		}
-		else coords[coordIndex] = newCoord;
+		else {
+			coords[coordIndex] = newCoord;
+			coordIndex++;
+			for (int i=0 ; i < nbOfSequences ; i++) {
+				subsetPositionsInSequences.get(i).add(newCoord[i]);
+			}
+		}
 	}
 	
-	public int length() {
-		return coordIndex;
+	public int[][] getCoordinates() {
+		return coords;
 	}
 
-	public List<String> getSubsequence(String[][] values) {
+	public List<Set<Integer>> getSubseqPositionsInSeq(){
+		return subsetPositionsInSequences;
+	}
+
+	public List<String> getSubsequence(String[][] sequences) {
 		List<String> subseq = new ArrayList<String>();
+		boolean placeholderNeeded = false;
+		//check if first symbol is a placeholder
+		String firstValue = sequences[0][0];
+		int valueIdx = 1;
+		while (!placeholderNeeded && valueIdx < sequences.length) {
+			if (!sequences[valueIdx][0].equals(firstValue))
+				placeholderNeeded = true;
+			valueIdx++;
+		}
+		//add common symbols with placeholders when needed
 		int[] lastPos = new int[nbOfSequences]; 
 		Arrays.fill(lastPos, -1);
 		int symbolIdx = 0;
+		int seqIdx;
 		while (symbolIdx < coordIndex) {
-			String nextSymbol = values[0][coords[symbolIdx][0]];
-			boolean placeholderNeeded = false;
-			int seqIdx = 0;
+			String nextSymbol = sequences[0][coords[symbolIdx][0]];
+			placeholderNeeded = false;
+			seqIdx = 0;
 			while (placeholderNeeded == false && seqIdx < nbOfSequences) {
 				if (coords[symbolIdx][seqIdx] > lastPos[seqIdx] + 1)
 					placeholderNeeded = true;
@@ -70,41 +94,40 @@ public class SubseqND implements ISubseqND {
 			subseq.add(nextSymbol);
 			symbolIdx++;
 		}
+		//check if last common symbol is a placeholder
+		boolean terminateWithPlaceholder = false;
+		seqIdx = 0;
+		while (terminateWithPlaceholder == false && seqIdx < nbOfSequences) {
+			terminateWithPlaceholder = (coords[coordIndex - 1][seqIdx] != (sequences[seqIdx].length - 1));
+			seqIdx++;
+		}
+		if (terminateWithPlaceholder)
+			subseq.add(ARG_PLACEHOLDER);
 		return subseq;
 	}
 
-	public List<String> getTrimmedSequence(String[][] values) {
-		List<String> sequence = getSubsequence(values);
+	public List<String> getTrimmedSequence(String[][] sequences) {
+		List<String> sequence = getSubsequence(sequences);
 		if (sequence.get(0).equals(SEQ_START))
 			sequence.remove(0);
 		if (sequence.get(sequence.size() - 1).equals(SEQ_END))
 			sequence.remove(sequence.size() -1);
 		return sequence;
 	}
-
-	public int[][] getSubSqCoordinatesInSq() {
-		return coords;
-	}
-
-	public boolean isASubseqOf(SubseqND other) {
-		boolean isASubseq = true;
-		if (coordIndex >= other.length()) {
-			isASubseq = false;
-		}
-		else {
-			int seqIndex = 0;
-			while (isASubseq && seqIndex < nbOfSequences) {
-				
-			}	
-		}
-		return isASubseq;
-	}
 	
-	private Set<Integer> convertArrayIntoSet(int[] array){
-		Set<Integer> set = new HashSet<Integer>();
-		for (int integer : array)
-			set.add(integer);
-		return set;
+	public boolean isASubseqOf(ISubseqND other) {
+		boolean isASubsetOf = true;
+		List<Set<Integer>> otherSubPosInSeq = other.getSubseqPositionsInSeq();
+		int seqIndex = 0;
+		while (isASubsetOf == true && seqIndex < nbOfSequences) {
+			isASubsetOf = (otherSubPosInSeq.get(seqIndex).containsAll(subsetPositionsInSequences.get(seqIndex)));
+			seqIndex++;
+		}
+		return isASubsetOf;
+	}
+
+	public int length() {
+		return coordIndex;
 	}
 
 }
