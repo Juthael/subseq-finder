@@ -9,17 +9,15 @@ import java.util.Set;
 import com.tregouet.subseq_finder.ISubseqND;
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
-public class SubseqND implements ISubseqND {
+public class SubseqND implements ISubseqND, Cloneable {
 
 	public static final String ARG_PLACEHOLDER = "_";
-	public static final String SEQ_START = "START";
-	public static final String SEQ_END = "END";
 	
 	private final int subseqMaxSize;
 	private final int nbOfSequences;
 	private final int[][] coords;
 	private int coordIndex;
-	private final List<Set<Integer>> subsetPositionsInSequences;
+	private final List<Set<Integer>> subseqPositionsInSequences;
 	
 	public SubseqND(int subSeqMaxSize, int nbOfSequences) {
 		this.subseqMaxSize = subSeqMaxSize;
@@ -28,10 +26,17 @@ public class SubseqND implements ISubseqND {
 		for (int[] coordinate : coords)
 			Arrays.fill(coordinate, -1);
 		coordIndex = 0;
-		subsetPositionsInSequences = new ArrayList<Set<Integer>>();
+		subseqPositionsInSequences = new ArrayList<Set<Integer>>();
 		for (int i=0 ; i < nbOfSequences ; i++) {
-			subsetPositionsInSequences.add(new HashSet<Integer>());
+			subseqPositionsInSequences.add(new HashSet<Integer>());
 		}
+	}
+	
+	public SubseqND(int subSeqMaxSize, int nbOfSequences, int[][] coords, int coordIndex, List<Set<Integer>> subsetPositionsInSequences) {
+		this.subseqMaxSize = subSeqMaxSize;
+		this.nbOfSequences = nbOfSequences;
+		this.coords = coords;
+		this.subseqPositionsInSequences = subsetPositionsInSequences;
 	}
 
 	public void addNewCoord(int[] newCoord) throws SubseqException {
@@ -50,7 +55,7 @@ public class SubseqND implements ISubseqND {
 			coords[coordIndex] = newCoord;
 			coordIndex++;
 			for (int i=0 ; i < nbOfSequences ; i++) {
-				subsetPositionsInSequences.get(i).add(newCoord[i]);
+				subseqPositionsInSequences.get(i).add(newCoord[i]);
 			}
 		}
 	}
@@ -60,7 +65,7 @@ public class SubseqND implements ISubseqND {
 	}
 
 	public List<Set<Integer>> getSubseqPositionsInSeq(){
-		return subsetPositionsInSequences;
+		return subseqPositionsInSequences;
 	}
 
 	public List<String> getSubsequence(String[][] sequences) {
@@ -105,22 +110,13 @@ public class SubseqND implements ISubseqND {
 			subseq.add(ARG_PLACEHOLDER);
 		return subseq;
 	}
-
-	public List<String> getTrimmedSequence(String[][] sequences) {
-		List<String> sequence = getSubsequence(sequences);
-		if (sequence.get(0).equals(SEQ_START))
-			sequence.remove(0);
-		if (sequence.get(sequence.size() - 1).equals(SEQ_END))
-			sequence.remove(sequence.size() -1);
-		return sequence;
-	}
 	
 	public boolean isASubseqOf(ISubseqND other) {
 		boolean isASubsetOf = true;
 		List<Set<Integer>> otherSubPosInSeq = other.getSubseqPositionsInSeq();
 		int seqIndex = 0;
 		while (isASubsetOf == true && seqIndex < nbOfSequences) {
-			isASubsetOf = (otherSubPosInSeq.get(seqIndex).containsAll(subsetPositionsInSequences.get(seqIndex)));
+			isASubsetOf = (otherSubPosInSeq.get(seqIndex).containsAll(subseqPositionsInSequences.get(seqIndex)));
 			seqIndex++;
 		}
 		return isASubsetOf;
@@ -128,6 +124,21 @@ public class SubseqND implements ISubseqND {
 
 	public int length() {
 		return coordIndex;
+	}
+	
+	@Override
+	public ISubseqND clone() {
+		ISubseqND subseqClone;
+		int[][] coordsClone = new int[coords.length][];
+		for (int i=0 ; i<coords.length ; i++) {
+			coordsClone[i] = Arrays.copyOf(coords[i], coords[i].length);
+		}
+		List<Set<Integer>> subseqPosInSeqClone = new ArrayList<Set<Integer>>();
+		for (Set<Integer> pos : subseqPositionsInSequences) {
+			subseqPosInSeqClone.add(new HashSet<Integer>(pos));
+		}
+		subseqClone = new SubseqND(subseqMaxSize, nbOfSequences, coordsClone, coordIndex, subseqPosInSeqClone);
+		return subseqClone;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 
-public interface ISubseqND {
+public interface ISubseqND extends Cloneable {
 	
 	public void addNewCoord(int[] newCoord) throws SubseqException;
 	
@@ -15,10 +15,10 @@ public interface ISubseqND {
 	
 	public List<String> getSubsequence(String[][] sequences);
 	
-	public List<String> getTrimmedSequence(String[][] sequences);
-	
 	public boolean isASubseqOf(ISubseqND other);
 	
 	public int length();
+	
+	public ISubseqND clone();
 
 }
