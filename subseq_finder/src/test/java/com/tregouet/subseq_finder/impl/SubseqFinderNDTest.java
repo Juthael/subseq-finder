@@ -19,7 +19,7 @@ public class SubseqFinderNDTest {
 	int[] coordC = {2,2,3};
 	int[] coordB2 = {3,5,4};
 	int[] coordD = {4,3,5};
-	//"false" coordinates in dotPlot;
+	//"false" coordinates in dotPlot ;
 	int[] false1 = {0,0,1};
 	int[] false2 = {1,2,2};
 	int[] false3 = {1,3,5};
