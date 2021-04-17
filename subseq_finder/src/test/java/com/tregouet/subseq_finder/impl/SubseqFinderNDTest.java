@@ -2,7 +2,8 @@ package com.tregouet.subseq_finder.impl;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class SubseqFinderNDTest {
 		sequences[0] = abcbd;
 		sequences[1] = abcdeb;
 		sequences[2] = afbcbd;
-		//subseqFinder = new SubseqFinder3D(sequences);
+		subseqFinder = new SubseqFinderND(sequences);
 	}
 
 	@Test
@@ -59,20 +60,15 @@ public class SubseqFinderNDTest {
 	}
 	
 	@Test
-	public void somethingToFindOut() {
-		int[] array1 = {1,2,3};
-		int[] array2 = Arrays.copyOf(array1, array1.length);
-		System.out.println("array1 : " + Arrays.toString(array1));
-		System.out.println("array2 : " + Arrays.toString(array2));
-		array2[0] = 7;
-		System.out.println("*******");
-		System.out.println("array1 : " + Arrays.toString(array1));
-		System.out.println("array2 : " + Arrays.toString(array2));
-		int int0 = 0;
-		int int1 = int0;
-		int0++;
-		System.out.println("int0 : " + int0 + " / int1 : " + int1);
-		assertTrue(true);
+	public void whenRequestedThenReturnsAllCommonMaxSubsequences() {
+		Set<List<String>> stringSubseqs = subseqFinder.getStringSubseqs();
+		for (List<String> subseq : stringSubseqs) {
+			System.out.println("***New subseq***");
+			for(String symbol : subseq)
+				System.out.print(symbol + " ; ");
+			System.out.println(System.lineSeparator());
+		}
+		assertTrue(false);
 	}
 
 }

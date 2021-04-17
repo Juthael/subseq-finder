@@ -36,6 +36,7 @@ public class SubseqND implements ISubseqND, Cloneable {
 		this.subseqMaxSize = subSeqMaxSize;
 		this.nbOfSequences = nbOfSequences;
 		this.coords = coords;
+		this.coordIndex = coordIndex;
 		this.subseqPositionsInSequences = subsetPositionsInSequences;
 	}
 
@@ -70,44 +71,38 @@ public class SubseqND implements ISubseqND, Cloneable {
 
 	public List<String> getSubsequence(String[][] sequences) {
 		List<String> subseq = new ArrayList<String>();
-		boolean placeholderNeeded = false;
-		//check if first symbol is a placeholder
-		String firstValue = sequences[0][0];
-		int valueIdx = 1;
-		while (!placeholderNeeded && valueIdx < sequences.length) {
-			if (!sequences[valueIdx][0].equals(firstValue))
-				placeholderNeeded = true;
-			valueIdx++;
-		}
-		//add common symbols with placeholders when needed
-		int[] lastPos = new int[nbOfSequences]; 
-		Arrays.fill(lastPos, -1);
-		int symbolIdx = 0;
-		int seqIdx;
-		while (symbolIdx < coordIndex) {
-			String nextSymbol = sequences[0][coords[symbolIdx][0]];
-			placeholderNeeded = false;
+		if (coordIndex > 0) {
+			boolean placeholderNeeded = false;
+			//add common symbols with placeholder symbols inserted when needed
+			int[] lastPos = new int[nbOfSequences]; 
+			Arrays.fill(lastPos, -1);
+			int seqIdx;
+			int symbolIdx = 0;
+			while (symbolIdx < coordIndex) {
+				String nextSymbol = sequences[0][coords[symbolIdx][0]];
+				placeholderNeeded = false;
+				seqIdx = 0;
+				while (placeholderNeeded == false && seqIdx < nbOfSequences) {
+					if (coords[symbolIdx][seqIdx] > lastPos[seqIdx] + 1)
+						placeholderNeeded = true;
+					seqIdx++;
+				}
+				lastPos = coords[symbolIdx];
+				if (placeholderNeeded)
+					subseq.add(ARG_PLACEHOLDER);
+				subseq.add(nextSymbol);
+				symbolIdx++;
+			}
+			//check if last symbol is a placeholder symbol
+			boolean terminateWithPlaceholder = false;
 			seqIdx = 0;
-			while (placeholderNeeded == false && seqIdx < nbOfSequences) {
-				if (coords[symbolIdx][seqIdx] > lastPos[seqIdx] + 1)
-					placeholderNeeded = true;
+			while (terminateWithPlaceholder == false && seqIdx < nbOfSequences) {
+				terminateWithPlaceholder = (coords[coordIndex - 1][seqIdx] != (sequences[seqIdx].length - 1));
 				seqIdx++;
 			}
-			lastPos = coords[symbolIdx];
-			if (placeholderNeeded)
-				subseq.add(ARG_PLACEHOLDER);
-			subseq.add(nextSymbol);
-			symbolIdx++;
+			if (terminateWithPlaceholder)
+				subseq.add(ARG_PLACEHOLDER);	
 		}
-		//check if last common symbol is a placeholder
-		boolean terminateWithPlaceholder = false;
-		seqIdx = 0;
-		while (terminateWithPlaceholder == false && seqIdx < nbOfSequences) {
-			terminateWithPlaceholder = (coords[coordIndex - 1][seqIdx] != (sequences[seqIdx].length - 1));
-			seqIdx++;
-		}
-		if (terminateWithPlaceholder)
-			subseq.add(ARG_PLACEHOLDER);
 		return subseq;
 	}
 	
