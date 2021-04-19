@@ -21,7 +21,7 @@ public interface ISubseq extends Cloneable, Comparable<ISubseq> {
 	 * @param newCoord new coordinates to be added to this sequence 
 	 * @throws SubseqException
 	 */
-	public void addNewCoord(int[] newCoord) throws SubseqException;
+	public void addNewCoord(int[] newCoord) throws;
 	
 	/**
 	 * Returns the coordinates of this sub-sequence in the compared sequences. <br>
@@ -33,6 +33,8 @@ public interface ISubseq extends Cloneable, Comparable<ISubseq> {
 	 *  
 	 * If this sub-sequence length is <i>n</i> < <i>s</i>, then all coordinates arrays at indexes <i>n</i> to <i>s</i>-1 
 	 * are filled with the default value -1. <br>
+	 * 
+	 * The parameter must not be null, nor have a different length than previously added coordinates. 
 	 *     
 	 * @return successive coordinates of this sequence
 	 */

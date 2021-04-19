@@ -44,25 +44,11 @@ public class Subseq implements ISubseq, Cloneable {
 		this.subseqPositionsInSequences = subsetPositionsInSequences;
 	}
 
-	public void addNewCoord(int[] newCoord) throws SubseqException {
-		if (newCoord == null) {
-			throw new SubseqException("Subseq.addNewCoord(int[]) : parameter is null.");
-		}
-		else if (coordIndex > subseqMaxSize - 1) {
-			throw new SubseqException("Subseq.addNewCoord(int[]) : the subsequence can't be this long.");
-		}
-		else if (newCoord.length != nbOfSequences) {
-			throw new SubseqException("Subseq.addNewCoord(int[]) : " + System.lineSeparator() + "the new coordinate "
-					+ "should contain "	+ Integer.toString(nbOfSequences) + " values instead of " 
-					+ Integer.toString(newCoord.length) + ".");
-		}
-		else {
-			coords[coordIndex] = newCoord;
-			coordIndex++;
-			for (int i=0 ; i < nbOfSequences ; i++) {
-				subseqPositionsInSequences.get(i).add(newCoord[i]);
-			}
-		}
+	public void addNewCoord(int[] newCoord) {
+		coords[coordIndex] = newCoord;
+		coordIndex++;
+		for (int i=0 ; i < nbOfSequences ; i++)
+			subseqPositionsInSequences.get(i).add(newCoord[i]);
 	}
 	
 	@Override

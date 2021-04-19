@@ -3,12 +3,15 @@ package com.tregouet.subseq_finder.impl.poset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.tregouet.subseq_finder.ISubseq;
 import com.tregouet.subseq_finder.ISubseqFinder;
+import com.tregouet.subseq_finder.exceptions.SubseqException;
+import com.tregouet.subseq_finder.impl.Subseq;
 import com.tregouet.subseq_finder.impl.dot_plot.utils.CoordinatesDP;
 import com.tregouet.subseq_finder.impl.poset.utils.CoordinatesPOS;
 import com.tregouet.subseq_finder.impl.poset.utils.Similarity;
@@ -16,58 +19,100 @@ import com.tregouet.subseq_finder.impl.poset.utils.Similarity;
 public class SubseqFinderPOS implements ISubseqFinder {
 
 	private final String[][] sequences;
+	private final int subseqMaxSize;
 	private final List<Similarity> similarities = new ArrayList<Similarity>();
-	private final Map<Similarity, Set<Similarity>> relation = new HashMap<Similarity, Set<Similarity>>();
+	private final Map<Similarity, Set<Similarity>> succRelation = new HashMap<Similarity, Set<Similarity>>();
 	private final Set<Similarity> seqSeeds = new HashSet<Similarity>();
 	private final Set<ISubseq> subsequences = new HashSet<ISubseq>();
 	
 	public SubseqFinderPOS(String[][]sequences) {
 		this.sequences = sequences;
+		subseqMaxSize = setSubseqMaxSize();
 		setSimilarities();
-		setRelation();
+		setSuccessorRelation();
 		setSubsequenceSeeds();
+		setSubsequences();
 	}
 	
 	public Set<ISubseq> getSubseqs() {
-		// TODO Auto-generated method stub
-		return null;
+		return subsequences;
 	}
 
 	public Set<List<String>> getStringSubseqs() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<List<String>> stringSubseqs = new HashSet<List<String>>();
+		for (ISubseq subseq : subsequences)
+			stringSubseqs.add(subseq.) //HERE
 	}
 	
-	private void setRelation() {
+	private void setSuccessorRelation() {
+		//set as relation (not reflective)
+		for (Similarity sim : similarities)
+			succRelation.put(sim, new HashSet<Similarity>());
 		for (int i=0 ; i < similarities.size() ; i++) {
 			for (int j=i ; j < similarities.size() ; j++) {
 				Similarity sim1 = similarities.get(i);
 				Similarity sim2 = similarities.get(j);
 				int comparison = sim1.compareTo(sim2);
-				if ((comparison == Similarity.LESS_THAN) || (comparison == Similarity.EQUAL_TO)) {
-					if (!relation.containsKey(sim1)) {
-						Set<Similarity> relatedToSim1 = new HashSet<Similarity>();
-						relatedToSim1.add(sim2);
-						relation.put(sim1, relatedToSim1);
-					}
-					else relation.get(sim1).add(sim2);
-				}
+				if (comparison == Similarity.LESS_THAN)
+					succRelation.get(sim1).add(sim2);
 				else if (comparison == Similarity.MORE_THAN) {
-					if (!relation.containsKey(sim2)) {
-						Set<Similarity> relatedToSim2 = new HashSet<Similarity>();
-						relatedToSim2.add(sim1);
-						relation.put(sim2, relatedToSim2);
-					}
-					else relation.get(sim2).add(sim1);
+					succRelation.get(sim2).add(sim1);
+				}
+			}
+		}
+		//set as successor relation
+		for (int i=0 ; i < similarities.size() ; i++) {
+			for (int j=0 ; j < similarities.size() ; j++) {
+				if ((i != j) && (succRelation.get(similarities.get(j)).contains(similarities.get(i)))) {
+					succRelation.get(similarities.get(j)).removeAll(succRelation.get(similarities.get(i)));
 				}
 			}
 		}
 	}
 	
 	private void setSubsequenceSeeds() {
-		for (Similarity sim : similarities) {
-			if (relation.get(sim).size() == 1)
-				seqSeeds.add(sim); //then this similarity is a minimal element only related to itself. 
+		seqSeeds.addAll(similarities);
+		for (Similarity keySim : succRelation.keySet()) {
+			seqSeeds.removeAll(succRelation.get(keySim)) ;
+		}
+	}
+	
+	private int setSubseqMaxSize() {
+		int maxSize = sequences[0].length;
+		for (int i=1 ; i < sequences.length ; i++) {
+			if (sequences[i].length < maxSize)
+				maxSize = sequences[i].length;
+		}
+		return maxSize;
+	}
+	
+	private void setSubsequences() {
+		for (Similarity seed : seqSeeds) {
+			ISubseq newSubseq = new Subseq(subseqMaxSize, sequences.length);
+			Set<Similarity> nextSimilarities = succRelation.get(seed);
+			if (!nextSimilarities.isEmpty())
+				subsequences.add(newSubseq);
+			else {
+				for (Similarity next : nextSimilarities)
+					continueSubsequence(newSubseq, next);
+			}
+		}
+	}
+	
+	//recursive
+	private void continueSubsequence(ISubseq subseqParam, Similarity sim) {
+		ISubseq subseq = subseqParam.clone();
+		subseq.addNewCoord(sim.getCoordinates());
+		Set<Similarity> relatedSim = succRelation.get(sim);
+		if (relatedSim.isEmpty()) {
+			//then similarity in parameter is a leaf
+			subsequences.add(subseq);
+		}
+		else {
+			for (Similarity nextSim : relatedSim) {
+				//recursion
+				continueSubsequence(subseq, nextSim);
+			}
 		}
 	}
 	
@@ -80,19 +125,37 @@ public class SubseqFinderPOS implements ISubseqFinder {
 		boolean similar = true;
 		do {
 			seqIdx = CoordinatesPOS.tryNext(coords, limits, seqIdx, similar);
-			similar = test(coords, seqIdx);
+			similar = testSimilarity(coords, seqIdx);
 			if (similar && (seqIdx == (sequences.length - 1)))
 				similarities.add(new Similarity(coords));
 		}
 		while (seqIdx != -1);
 	}
 	
-	private boolean test(int[] coords, int seqIdx) {
+	private boolean testSimilarity(int[] coords, int seqIdx) {
 		if (seqIdx != -1) {
 			String refSymbol = sequences[0][coords[0]];
 			return refSymbol.equals(sequences[seqIdx][coords[seqIdx]]);
 		}
 		else return false;
-	}	
+	}
+	
+	private boolean addSubSeqToSet(ISubseq subseq) {
+		boolean maxSubset = true;
+		Set<ISubseq> notMaxSubsetsAfterAll = new HashSet<ISubseq>();
+		Iterator<ISubseq> iterator = subsequences.iterator();
+		while (maxSubset && iterator.hasNext()) {
+			ISubseq other = iterator.next();
+			int comparison = subseq.compareTo(other);
+			if (comparison == Subseq.LESS_THAN)
+				maxSubset = false;
+			else if (comparison == Subseq.MORE_THAN)
+				notMaxSubsetsAfterAll.add(other);
+		}
+		subsequences.removeAll(notMaxSubsetsAfterAll);
+		if (maxSubset)
+			subsequences.add(subseq);
+		return maxSubset;
+	}
 
 }
