@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.utils;
+package com.tregouet.subseq_finder.impl.dot_plot.utils;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CoordinatesTest {
+import com.tregouet.subseq_finder.impl.dot_plot.utils.CoordinatesDP;
+
+public class CoordinatesDPTest {
 
 	int[] coord = {1,1,1};
 	int[] dotPlotLimits = {4,4,4};
@@ -35,13 +37,13 @@ public class CoordinatesTest {
 	@Test
 	public void whenCoordIncrementedThenAsExpected() {
 		boolean asExpected = true;
-		System.out.println(Coordinates.toString(coord));
+		System.out.println(CoordinatesDP.toString(coord));
 		boolean outOfDotPlot = false;
 		int expectationIndex = 1;
 		while (!outOfDotPlot && asExpected) {
-			outOfDotPlot = !Coordinates.advanceInSpecifiedArea(coord, dotPlotLimits, lowerBound, upperBounds);
+			outOfDotPlot = !CoordinatesDP.advanceInSpecifiedArea(coord, dotPlotLimits, lowerBound, upperBounds);
 			if (!outOfDotPlot) {
-				System.out.println(Coordinates.toString(coord));
+				System.out.println(CoordinatesDP.toString(coord));
 				asExpected = (Arrays.equals(coord, expected[expectationIndex]));
 			}
 			expectationIndex++;

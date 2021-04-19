@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.utils;
+package com.tregouet.subseq_finder.impl.dot_plot.utils;
 
 import org.api.hyperdrive.NArray;
 

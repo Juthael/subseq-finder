@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl;
+package com.tregouet.subseq_finder.impl.dot_plot;
 
 import static org.junit.Assert.assertTrue;
 
@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
+import com.tregouet.subseq_finder.impl.dot_plot.SubseqFinderDP;
 
 public class SubseqFinderNDTest {
 
@@ -23,7 +24,7 @@ public class SubseqFinderNDTest {
 	int[] false1 = {0,0,1};
 	int[] false2 = {1,2,2};
 	int[] false3 = {1,3,5};
-	private SubseqFinderND subseqFinder;
+	private SubseqFinderDP subseqFinder;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -33,7 +34,7 @@ public class SubseqFinderNDTest {
 		sequences[0] = abcbd;
 		sequences[1] = abcdeb;
 		sequences[2] = afbcbd;
-		subseqFinder = new SubseqFinderND(sequences);
+		subseqFinder = new SubseqFinderDP(sequences);
 	}
 
 	@Test
@@ -69,6 +70,6 @@ public class SubseqFinderNDTest {
 			System.out.println(System.lineSeparator());
 		}
 		assertTrue(false);
-	}
+	}	
 
 }

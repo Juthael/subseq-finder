@@ -15,13 +15,13 @@ import java.util.Set;
  * @author Gael Tregouet
  *
  */
-public interface ISubseqFinderND {
+public interface ISubseqFinder {
 	
 	/**
 	 * 
-	 * @return all maximal common subsequences as positions in the compared sequences, in a {@link ISubseqND} format 
+	 * @return all maximal common subsequences as positions in the compared sequences, in a {@link ISubseq} format 
 	 */
-	public Set<ISubseqND> getSubseqs();
+	public Set<ISubseq> getSubseqs();
 	
 	/**
 	 * A placeholder is inserted in a returned subsequence : <br> 

@@ -1,5 +1,8 @@
 package com.tregouet.subseq_finder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -35,4 +38,5 @@ public class AppTest
     {
         assertTrue( true );
     }
+    
 }

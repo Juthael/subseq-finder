@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl;
+package com.tregouet.subseq_finder.impl.dot_plot;
 
 import static org.junit.Assert.*;
 
@@ -9,17 +9,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tregouet.subseq_finder.ISubseqND;
+import com.tregouet.subseq_finder.ISubseq;
+import com.tregouet.subseq_finder.impl.Subseq;
 
 public class SubseqNDTest {
 
 	private String[][] values = new String[3][];
 	//abcd in {abcbd, abcdeb, xafbcdb}
-	private ISubseqND subseq1 = new SubseqND(5, 3);
+	private ISubseq subseq1 = new Subseq(5, 3);
 	//abc in {abcbd, abcdeb, xafbcdb}
-	private ISubseqND subseq2 = new SubseqND(5, 3);
+	private ISubseq subseq2 = new Subseq(5, 3);
 	//abb in {abcbd, abcdeb, xafbcdb}
-	private ISubseqND subseq3 = new SubseqND(5, 3);
+	private ISubseq subseq3 = new Subseq(5, 3);
 	
 	@Before
 	public void setUp() throws Exception {

@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.utils;
+package com.tregouet.subseq_finder.impl.dot_plot.utils;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import com.tregouet.subseq_finder.exceptions.SubseqException;
  * @author Gael Tregouet
  *
  */
-public class Coordinates extends Coord {
+public class CoordinatesDP extends Coord {
 
-	private Coordinates() {
+	private CoordinatesDP() {
 	}
 	
 	/**

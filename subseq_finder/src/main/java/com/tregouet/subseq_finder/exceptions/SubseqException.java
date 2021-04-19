@@ -2,6 +2,8 @@ package com.tregouet.subseq_finder.exceptions;
 
 public class SubseqException extends Exception {
 
+	private static final long serialVersionUID = 5823318307906820323L;
+
 	public SubseqException() {
 	}
 
