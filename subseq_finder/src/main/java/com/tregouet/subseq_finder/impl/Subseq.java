@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.tregouet.subseq_finder.ISubseq;
-import com.tregouet.subseq_finder.exceptions.SubseqException;
 
 public class Subseq implements ISubseq, Cloneable {
 

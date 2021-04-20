@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.dot_plot;
+package com.tregouet.subseq_finder.impl;
 
 import static org.junit.Assert.*;
 
@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.tregouet.subseq_finder.ISubseq;
 import com.tregouet.subseq_finder.impl.Subseq;
 
-public class SubseqNDTest {
+public class SubseqTest {
 
 	private String[][] values = new String[3][];
 	//abcd in {abcbd, abcdeb, xafbcdb}

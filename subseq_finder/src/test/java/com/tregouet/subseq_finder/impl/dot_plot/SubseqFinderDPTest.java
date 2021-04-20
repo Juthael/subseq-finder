@@ -2,16 +2,18 @@ package com.tregouet.subseq_finder.impl.dot_plot;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tregouet.subseq_finder.ISubseq;
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 import com.tregouet.subseq_finder.impl.dot_plot.SubseqFinderDP;
 
-public class SubseqFinderNDTest {
+public class SubseqFinderDPTest {
 
 	private String[][] sequences = new String[3][];
 	//"true" coordinates in dotPlot;
@@ -62,11 +64,11 @@ public class SubseqFinderNDTest {
 	
 	@Test
 	public void whenRequestedThenReturnsAllCommonMaxSubsequences() {
-		Set<List<String>> stringSubseqs = subseqFinder.getStringSubseqs();
-		for (List<String> subseq : stringSubseqs) {
-			System.out.println("***New subseq***");
-			for(String symbol : subseq)
-				System.out.print(symbol + " ; ");
+		Set<ISubseq> subseqs = subseqFinder.getSubseqs();
+		for (ISubseq subseq : subseqs) {
+			System.out.println("*****New Subseq*****");
+			System.out.println(Arrays.deepToString(subseq.getCoordinates()));
+			System.out.println(subseq.getSubsequence(sequences).toString());
 			System.out.println(System.lineSeparator());
 		}
 		assertTrue(false);

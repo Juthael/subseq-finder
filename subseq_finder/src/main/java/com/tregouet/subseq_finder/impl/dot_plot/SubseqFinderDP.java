@@ -12,46 +12,18 @@ import com.tregouet.subseq_finder.ISubseqFinder;
 import com.tregouet.subseq_finder.ISubseq;
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 import com.tregouet.subseq_finder.impl.Subseq;
+import com.tregouet.subseq_finder.impl.SubseqFinder;
 import com.tregouet.subseq_finder.impl.dot_plot.utils.CoordinatesDP;
 import com.tregouet.subseq_finder.impl.dot_plot.utils.NArrayBool;
 
-public class SubseqFinderDP implements ISubseqFinder {
+public class SubseqFinderDP extends SubseqFinder implements ISubseqFinder {
 
-	private final String[][] sequences;
-	private final int subseqMaxSize;
 	private final NArrayBool dotPlot;
-	private final Set<ISubseq> subsequences;
-	
 	
 	public SubseqFinderDP(String[][]sequences) throws SubseqException {
-		if (sequences != null && sequences.length > 0) {
-			this.sequences = sequences;
-			dotPlot = setDotPlot();
-			int subsequenceMaxSize = sequences[0].length;
-			for (int i=1 ; i < sequences.length ; i++) {
-				if (sequences[i].length < subsequenceMaxSize)
-					subsequenceMaxSize = sequences[i].length;
-			}
-			subseqMaxSize = subsequenceMaxSize;
-			try {
-				subsequences = setSubsequences(dotPlot);
-			} catch (Exception e) {
-				throw new SubseqException("SubseqFinderDP(String[][]) : " + System.lineSeparator() + e.getMessage());
-			}
-		}
-		else throw new SubseqException("SubseqFinderDP(String[][]) : parameter is null or empty.");
-	}
-
-	public Set<ISubseq> getSubseqs() {
-		return subsequences;
-	}
-
-	public Set<List<String>> getStringSubseqs() {
-		Set<List<String>> stringSubseqs = new HashSet<List<String>>();
-		for (ISubseq subseq : subsequences) {
-			stringSubseqs.add(subseq.getSubsequence(sequences));
-		}
-		return stringSubseqs;
+		super(sequences);
+		dotPlot = setDotPlot();
+		setSubsequences();
 	}
 	
 	// for test use only
@@ -73,44 +45,8 @@ public class SubseqFinderDP implements ISubseqFinder {
 		return isASameSymbolCoord;
 	}
 	
-	private Set<ISubseq> setSubsequences(NArrayBool dotPlot) throws SubseqException {
-		Set<ISubseq> subsequences = new HashSet<ISubseq>();
-		ISubseq subseqSeed = new Subseq(subseqMaxSize, sequences.length);
-		int[] dotPlotLimits = dotPlot.dimensions();
-		int[] currCoord = new int[sequences.length];
-		boolean allFirstValuesFound = false;
-		//lists of minimal coordinates of areas in the dot plot that doesn't need to be looked up (empty at first)
-		List<List<Integer>> upperBounds = new ArrayList<List<Integer>>();
-		//looks every relevant place up in the dot plot. 
-		while (!allFirstValuesFound) {
-			if (dotPlot.getBoolean(currCoord) == true) {
-				//a first common symbol has been found for the beginning of a new sub-sequence
-				try {
-					//returns all max common sub-sequences beginning with this symbol
-					subsequences.addAll(continueSubsequence(subseqSeed, currCoord, dotPlotLimits));
-				} catch (Exception e) {
-					throw new SubseqException("SubseqFinderDP.setSubsequences : " + System.lineSeparator() 
-						+ e.getMessage());
-				}
-				/* removes the area that has just been explored (while building the last sub-sequences) 
-				 * from the reachable dot plot space.  
-				 */
-				List<Integer> newUpperBound = new ArrayList<Integer>();
-				for (int i=0 ; i < currCoord.length ; i++)
-					newUpperBound.add(currCoord[i] +1);
-				upperBounds.add(newUpperBound);
-			}
-			//if there remains a reachable position to be looked up in the dot plot, then continue search
-			allFirstValuesFound = 
-					!CoordinatesDP.advanceInSpecifiedArea(
-							currCoord, dotPlotLimits, new int[dotPlotLimits.length], upperBounds);
-		}
-		return subsequences;
-	}
-	
 	//recursive
-	private Set<ISubseq> continueSubsequence(ISubseq paramSubseq, int[] newSymbolCoord, int[] dotPlotLimits) 
-			throws SubseqException{
+	private Set<ISubseq> continueSubsequence(ISubseq paramSubseq, int[] newSymbolCoord, int[] dotPlotLimits) {
 		//HERE
 		System.out.println(System.lineSeparator() + "***continueSubsequence()***" + System.lineSeparator() + "Current subseq : ");
 		System.out.println(paramSubseq.getSubsequence(sequences));
@@ -119,13 +55,7 @@ public class SubseqFinderDP implements ISubseqFinder {
 		Set<ISubseq> subseqs = new HashSet<ISubseq>();
 		ISubseq subseq = paramSubseq.clone();
 		//add specified new coordinate to current sub-sequence
-		try {
-			subseq.addNewCoord(newSymbolCoord);
-		} catch (Exception e) {
-			throw new SubseqException("SubseqFinderDP.continueSubsequence() : " + System.lineSeparator() 
-				+ "current subseq : " + Arrays.deepToString(subseq.getCoordinates()) + System.lineSeparator() + 
-				e.getMessage());
-		}
+		subseq.addNewCoord(newSymbolCoord);
 		//HERE
 		System.out.println("New symbol : " + sequences[0][newSymbolCoord[0]]);
 		System.out.println("New coordinates : " + Arrays.toString(newSymbolCoord));
@@ -152,16 +82,10 @@ public class SubseqFinderDP implements ISubseqFinder {
 				System.out.println("Next symbol : " + sequences[0][nextCoord[0]]);
 				System.out.println("New coordinates : " + Arrays.toString(nextCoord));
 				//HERE
-				try {
-					/* recursion. Returns all max common sub-sequences beginning with current sub-sequence plus the 
-					 * new symbol coordinates 
-					 */
-					subseqs.addAll(continueSubsequence(subseq, nextCoord, dotPlotLimits));
-				}
-				catch (Exception e) {
-					throw new SubseqException("SubseqFinderDP.continueSubsequence() : " + System.lineSeparator() 
-					+ e.getMessage());
-				}
+				/* recursion. Returns all max common sub-sequences beginning with current sub-sequence plus the 
+				 * new symbol coordinates 
+				 */
+				subseqs.addAll(continueSubsequence(subseq, nextCoord, dotPlotLimits));
 				/* removes the area that has just been explored (while building the last sub-sequences) 
 				 * from the reachable dot plot space
 				 */
@@ -215,5 +139,32 @@ public class SubseqFinderDP implements ISubseqFinder {
 		}
 		return dotPlot;
 	}
-
+	
+	private void setSubsequences() {
+		ISubseq subseqSeed = new Subseq(subseqMaxSize, sequences.length);
+		int[] dotPlotLimits = dotPlot.dimensions();
+		int[] currCoord = new int[sequences.length];
+		boolean allFirstValuesFound = false;
+		//lists of minimal coordinates of areas in the dot plot that doesn't need to be looked up (empty at first)
+		List<List<Integer>> upperBounds = new ArrayList<List<Integer>>();
+		//looks every relevant place up in the dot plot. 
+		while (!allFirstValuesFound) {
+			if (dotPlot.getBoolean(currCoord) == true) {
+				//a first common symbol has been found for the beginning of a new sub-sequence
+				//returns all max common sub-sequences beginning with this symbol
+				subsequences.addAll(continueSubsequence(subseqSeed, currCoord, dotPlotLimits));
+				/* removes the area that has just been explored (while building the last sub-sequences) 
+				 * from the reachable dot plot space.  
+				 */
+				List<Integer> newUpperBound = new ArrayList<Integer>();
+				for (int i=0 ; i < currCoord.length ; i++)
+					newUpperBound.add(currCoord[i] + 1);
+				upperBounds.add(newUpperBound);
+			}
+			//if there remains a reachable position to be looked up in the dot plot, then continue search
+			allFirstValuesFound = 
+					!CoordinatesDP.advanceInSpecifiedArea(
+							currCoord, dotPlotLimits, new int[dotPlotLimits.length], upperBounds);
+		}
+	}
 }

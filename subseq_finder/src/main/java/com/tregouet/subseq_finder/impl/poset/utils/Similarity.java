@@ -52,10 +52,10 @@ public class Similarity implements Comparable<Similarity> {
 			boolean moreThanOther = true;
 			int coordIdx = 0;
 			while ((lessThanOther || moreThanOther) && (coordIdx < this.length())) {
-				if (moreThanOther && (this.getCoordinates()[coordIdx] <= other.getCoordinates()[coordIdx]))
-					moreThanOther = false;
-				else if (lessThanOther && (this.getCoordinates()[coordIdx] >= other.getCoordinates()[coordIdx]))
-					lessThanOther = false;
+				if (lessThanOther)
+					lessThanOther = (this.getCoordinates()[coordIdx] < other.getCoordinates()[coordIdx]);
+				if (moreThanOther)
+					moreThanOther = (this.getCoordinates()[coordIdx] > other.getCoordinates()[coordIdx]);
 				coordIdx++;	
 			}
 			if (lessThanOther)

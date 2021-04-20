@@ -21,7 +21,7 @@ public interface ISubseq extends Cloneable, Comparable<ISubseq> {
 	 * @param newCoord new coordinates to be added to this sequence 
 	 * @throws SubseqException
 	 */
-	public void addNewCoord(int[] newCoord) throws;
+	public void addNewCoord(int[] newCoord);
 	
 	/**
 	 * Returns the coordinates of this sub-sequence in the compared sequences. <br>
