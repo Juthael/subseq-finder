@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.poset.utils;
+package com.tregouet.subseq_finder.impl.utils;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,9 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CoordinatesPOSTest {
+import com.tregouet.subseq_finder.impl.utils.Coordinates;
+
+public class CoordinatesTest {
 
 	String[][] sequences = new String[3][];
 	
@@ -37,7 +39,7 @@ public class CoordinatesPOSTest {
 		System.out.println("sequence index : " + seqIdx + System.lineSeparator());
 		*/
 		do {
-			seqIdx = CoordinatesPOS.tryNext(coords, limits, seqIdx, similar);
+			seqIdx = Coordinates.tryNext(coords, limits, seqIdx, similar);
 			similar = test(coords, seqIdx);
 			if (seqIdx != -1) {
 				int[] posTested = Arrays.copyOfRange(coords, 0, seqIdx +1);

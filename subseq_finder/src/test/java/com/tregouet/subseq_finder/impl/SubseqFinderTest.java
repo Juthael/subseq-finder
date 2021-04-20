@@ -1,19 +1,17 @@
-package com.tregouet.subseq_finder.impl.dot_plot;
+package com.tregouet.subseq_finder.impl;
 
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.tregouet.subseq_finder.ISubseq;
-import com.tregouet.subseq_finder.exceptions.SubseqException;
-import com.tregouet.subseq_finder.impl.dot_plot.SubseqFinderDP;
+import com.tregouet.subseq_finder.impl.SubseqFinder;
 
-public class SubseqFinderDPTest {
+public class SubseqFinderTest {
 
 	private String[][] sequences = new String[3][];
 	//"true" coordinates in dotPlot;
@@ -26,7 +24,7 @@ public class SubseqFinderDPTest {
 	int[] false1 = {0,0,1};
 	int[] false2 = {1,2,2};
 	int[] false3 = {1,3,5};
-	private SubseqFinderDP subseqFinder;
+	private SubseqFinder subseqFinder;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -36,32 +34,9 @@ public class SubseqFinderDPTest {
 		sequences[0] = abcbd;
 		sequences[1] = abcdeb;
 		sequences[2] = afbcbd;
-		subseqFinder = new SubseqFinderDP(sequences);
+		subseqFinder = new SubseqFinder(sequences);
 	}
 
-	@Test
-	public void whenSymbolsAtSpecifiedPosAreIdenticalThenReturnsTrueOtherwiseFalse() 
-			throws SubseqException {
-		boolean asExpected = true;
-		if (subseqFinder.isASameSymbolCoord(coordA) == false)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(coordB1) == false)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(coordB2) == false)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(coordC) == false)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(coordD) == false)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(false1) == true)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(false2) == true)
-			asExpected = false;
-		if (subseqFinder.isASameSymbolCoord(false3) == true)
-			asExpected = false;
-		assertTrue(asExpected);
-	}
-	
 	@Test
 	public void whenRequestedThenReturnsAllCommonMaxSubsequences() {
 		Set<ISubseq> subseqs = subseqFinder.getSubseqs();
@@ -72,6 +47,6 @@ public class SubseqFinderDPTest {
 			System.out.println(System.lineSeparator());
 		}
 		assertTrue(false);
-	}	
+	}		
 
 }

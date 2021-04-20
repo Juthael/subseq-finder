@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl.poset.utils;
+package com.tregouet.subseq_finder.impl.utils;
 
 import java.util.Arrays;
 
