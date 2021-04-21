@@ -6,9 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.tregouet.subseq_finder.ISubseq;
+import com.tregouet.subseq_finder.ICoordSubseq;
+import com.tregouet.subseq_finder.ISymbolSeq;
 
-public class Subseq implements ISubseq, Cloneable {
+public class CoordSubseq implements ICoordSubseq, Cloneable {
 
 	public static final String ARG_PLACEHOLDER = "_";
 	public static final int NOT_COMPARABLE = -2;
@@ -22,7 +23,7 @@ public class Subseq implements ISubseq, Cloneable {
 	private int coordIndex;
 	private final List<Set<Integer>> subseqPositionsInSequences;
 	
-	public Subseq(int subSeqMaxSize, int nbOfSequences) {
+	public CoordSubseq(int subSeqMaxSize, int nbOfSequences) {
 		this.subseqMaxSize = subSeqMaxSize;
 		this.nbOfSequences = nbOfSequences;
 		coords = new int[subSeqMaxSize][nbOfSequences];
@@ -35,7 +36,7 @@ public class Subseq implements ISubseq, Cloneable {
 		}
 	}
 	
-	private Subseq(int subSeqMaxSize, int nbOfSequences, int[][] coords, int coordIndex, List<Set<Integer>> subsetPositionsInSequences) {
+	private CoordSubseq(int subSeqMaxSize, int nbOfSequences, int[][] coords, int coordIndex, List<Set<Integer>> subsetPositionsInSequences) {
 		this.subseqMaxSize = subSeqMaxSize;
 		this.nbOfSequences = nbOfSequences;
 		this.coords = coords;
@@ -51,8 +52,8 @@ public class Subseq implements ISubseq, Cloneable {
 	}
 	
 	@Override
-	public ISubseq clone() {
-		ISubseq subseqClone;
+	public ICoordSubseq clone() {
+		ICoordSubseq subseqClone;
 		int[][] coordsClone = new int[coords.length][];
 		for (int i=0 ; i<coords.length ; i++) {
 			coordsClone[i] = Arrays.copyOf(coords[i], coords[i].length);
@@ -61,11 +62,11 @@ public class Subseq implements ISubseq, Cloneable {
 		for (Set<Integer> pos : subseqPositionsInSequences) {
 			subseqPosInSeqClone.add(new HashSet<Integer>(pos));
 		}
-		subseqClone = new Subseq(subseqMaxSize, nbOfSequences, coordsClone, coordIndex, subseqPosInSeqClone);
+		subseqClone = new CoordSubseq(subseqMaxSize, nbOfSequences, coordsClone, coordIndex, subseqPosInSeqClone);
 		return subseqClone;
 	}
 
-	public int compareTo(ISubseq other) {
+	public int compareTo(ICoordSubseq other) {
 		if (this.equals(other))
 			return EQUAL_TO;
 		if (this.isASubseqOf(other))
@@ -83,7 +84,7 @@ public class Subseq implements ISubseq, Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Subseq other = (Subseq) obj;
+		CoordSubseq other = (CoordSubseq) obj;
 		if (coordIndex != other.coordIndex)
 			return false;
 		if (subseqPositionsInSequences == null) {
@@ -102,7 +103,7 @@ public class Subseq implements ISubseq, Cloneable {
 		return subseqPositionsInSequences;
 	}
 	
-	public List<String> getSubsequence(String[][] sequences) {
+	public ISymbolSeq getSymbolSubseq(String[][] sequences) {
 		List<String> subseq = new ArrayList<String>();
 		if (coordIndex > 0) {
 			boolean placeholderNeeded = false;
@@ -136,7 +137,7 @@ public class Subseq implements ISubseq, Cloneable {
 			if (terminateWithPlaceholder)
 				subseq.add(ARG_PLACEHOLDER);	
 		}
-		return subseq;
+		return new SymbolSeq(subseq);
 	}
 
 	@Override
@@ -149,7 +150,7 @@ public class Subseq implements ISubseq, Cloneable {
 		return result;
 	}
 
-	public boolean isASubseqOf(ISubseq other) {
+	public boolean isASubseqOf(ICoordSubseq other) {
 		boolean isASubsetOf = true;
 		if (other.length() > this.length()) {
 			List<Set<Integer>> otherSubPosInSeq = other.getSubseqPositionsInSeq();

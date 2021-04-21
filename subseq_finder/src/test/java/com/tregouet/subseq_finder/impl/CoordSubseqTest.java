@@ -9,18 +9,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tregouet.subseq_finder.ISubseq;
-import com.tregouet.subseq_finder.impl.Subseq;
+import com.tregouet.subseq_finder.ICoordSubseq;
+import com.tregouet.subseq_finder.impl.CoordSubseq;
 
-public class SubseqTest {
+public class CoordSubseqTest {
 
 	private String[][] values = new String[3][];
 	//abcd in {abcbd, abcdeb, xafbcdb}
-	private ISubseq subseq1 = new Subseq(5, 3);
+	private ICoordSubseq subseq1 = new CoordSubseq(5, 3);
 	//abc in {abcbd, abcdeb, xafbcdb}
-	private ISubseq subseq2 = new Subseq(5, 3);
+	private ICoordSubseq subseq2 = new CoordSubseq(5, 3);
 	//abb in {abcbd, abcdeb, xafbcdb}
-	private ISubseq subseq3 = new Subseq(5, 3);
+	private ICoordSubseq subseq3 = new CoordSubseq(5, 3);
 	
 	@Before
 	public void setUp() throws Exception {
@@ -52,9 +52,9 @@ public class SubseqTest {
 		List<String> expected1 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "c", "_", "d", "_"));
 		List<String> expected2 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "c", "_"));
 		List<String> expected3 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "_", "b", "_"));
-		List<String> returned1 = subseq1.getSubsequence(values);
-		List<String> returned2 = subseq2.getSubsequence(values);
-		List<String> returned3 = subseq3.getSubsequence(values);
+		List<String> returned1 = subseq1.getSymbolSubseq(values);
+		List<String> returned2 = subseq2.getSymbolSubseq(values);
+		List<String> returned3 = subseq3.getSymbolSubseq(values);
 		System.out.println("subseq1 : " + returned1.toString() + System.lineSeparator() 
 			+ "subseq1 expected : " + expected1.toString());
 		System.out.println("subseq2 : " + returned2.toString() + System.lineSeparator() 

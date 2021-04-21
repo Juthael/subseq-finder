@@ -3,12 +3,13 @@ package com.tregouet.subseq_finder.impl;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tregouet.subseq_finder.ISubseq;
+import com.tregouet.subseq_finder.ICoordSubseq;
 import com.tregouet.subseq_finder.impl.SubseqFinder;
 
 public class SubseqFinderTest {
@@ -39,12 +40,17 @@ public class SubseqFinderTest {
 
 	@Test
 	public void whenRequestedThenReturnsAllCommonMaxSubsequences() {
-		Set<ISubseq> subseqs = subseqFinder.getSubseqs();
-		for (ISubseq subseq : subseqs) {
-			System.out.println("*****New Subseq*****");
-			System.out.println(Arrays.deepToString(subseq.getCoordinates()));
-			System.out.println(subseq.getSubsequence(sequences).toString());
+		Set<ICoordSubseq> coordSubseqs = subseqFinder.getCoordSubseqs();
+		for (ICoordSubseq coordSubseq : coordSubseqs) {
+			System.out.println("*****New CoordSubseq*****");
+			System.out.println(Arrays.deepToString(coordSubseq.getCoordinates()));
+			System.out.println(coordSubseq.getSymbolSubseq(sequences).toString());
 			System.out.println(System.lineSeparator());
+		}
+		Set<List<String>> subsequencesOfSymbols = subseqFinder.getMaxCommonSubseqs();
+		System.out.println("*****Common max subsequences of symbols");
+		for (List<String> subsequence : subsequencesOfSymbols) {
+			System.out.println(subsequence.toString());
 		}
 		assertTrue(false);
 	}		
