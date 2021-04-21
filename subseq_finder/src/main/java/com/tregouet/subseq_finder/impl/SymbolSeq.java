@@ -80,5 +80,10 @@ public class SymbolSeq implements ISymbolSeq {
 		}
 		return subsetOf;
 	}
+	
+	@Override
+	public String toString() {
+		return sequence.toString();
+	}
 
 }

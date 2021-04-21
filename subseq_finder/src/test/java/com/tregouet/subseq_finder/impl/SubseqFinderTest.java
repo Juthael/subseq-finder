@@ -2,15 +2,17 @@ package com.tregouet.subseq_finder.impl;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tregouet.subseq_finder.ICoordSubseq;
-import com.tregouet.subseq_finder.impl.SubseqFinder;
+import com.tregouet.subseq_finder.ISymbolSeq;
+import com.tregouet.subseq_finder.exceptions.SubseqException;
 
 public class SubseqFinderTest {
 
@@ -28,18 +30,26 @@ public class SubseqFinderTest {
 	private SubseqFinder subseqFinder;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		String[] abcbd = {"a", "b", "c", "b", "d"};
 		String[] abcdeb = {"a", "b", "c", "d", "e", "b"};
 		String[] afbcbd = {"a", "f", "b", "c", "b", "d"};
 		sequences[0] = abcbd;
 		sequences[1] = abcdeb;
 		sequences[2] = afbcbd;
-		subseqFinder = new SubseqFinder(sequences);
 	}
 
 	@Test
-	public void whenRequestedThenReturnsAllCommonMaxSubsequences() {
+	public void whenRequestedThenReturnsAllCommonMaxSubsequences() throws SubseqException {
+		subseqFinder = new SubseqFinder(sequences);
+		Set<ISymbolSeq> expected = new HashSet<ISymbolSeq>();
+		List<String> expectedList1 = 
+				new ArrayList<String>(Arrays.asList(new String[] {"a", "_", "b", "c", "_", "d", "_"}));
+		List<String> expectedList2 = 
+						new ArrayList<String>(Arrays.asList(new String[] {"a", "_", "b", "c", "_", "b", "_"}));
+		expected.add(new SymbolSeq(expectedList1));
+		expected.add(new SymbolSeq(expectedList2));	
+		/*
 		Set<ICoordSubseq> coordSubseqs = subseqFinder.getCoordSubseqs();
 		for (ICoordSubseq coordSubseq : coordSubseqs) {
 			System.out.println("*****New CoordSubseq*****");
@@ -47,12 +57,15 @@ public class SubseqFinderTest {
 			System.out.println(coordSubseq.getSymbolSubseq(sequences).toString());
 			System.out.println(System.lineSeparator());
 		}
-		Set<List<String>> subsequencesOfSymbols = subseqFinder.getMaxCommonSubseqs();
+		*/
+		Set<ISymbolSeq> returned = subseqFinder.getMaxCommonSubseqs();
+		/*
 		System.out.println("*****Common max subsequences of symbols");
-		for (List<String> subsequence : subsequencesOfSymbols) {
+		for (ISymbolSeq subsequence : returned) {
 			System.out.println(subsequence.toString());
 		}
-		assertTrue(false);
+		*/
+		assertTrue(returned.equals(expected));
 	}		
 
 }

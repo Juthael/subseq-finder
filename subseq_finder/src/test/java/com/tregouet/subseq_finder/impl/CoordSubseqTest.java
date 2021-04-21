@@ -1,16 +1,14 @@
 package com.tregouet.subseq_finder.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.tregouet.subseq_finder.ICoordSubseq;
-import com.tregouet.subseq_finder.impl.CoordSubseq;
+import com.tregouet.subseq_finder.ISymbolSeq;
 
 public class CoordSubseqTest {
 
@@ -49,12 +47,12 @@ public class CoordSubseqTest {
 
 	@Test
 	public void whenSubsequenceRequestedThenExpectedReturnedWithPlaceholders() {
-		List<String> expected1 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "c", "_", "d", "_"));
-		List<String> expected2 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "c", "_"));
-		List<String> expected3 = new ArrayList<String>(Arrays.asList("_", "a", "_", "b", "_", "b", "_"));
-		List<String> returned1 = subseq1.getSymbolSubseq(values);
-		List<String> returned2 = subseq2.getSymbolSubseq(values);
-		List<String> returned3 = subseq3.getSymbolSubseq(values);
+		ISymbolSeq expected1 = new SymbolSeq(Arrays.asList("_", "a", "_", "b", "c", "_", "d", "_"));
+		ISymbolSeq expected2 = new SymbolSeq(Arrays.asList("_", "a", "_", "b", "c", "_"));
+		ISymbolSeq expected3 = new SymbolSeq(Arrays.asList("_", "a", "_", "b", "_", "b", "_"));
+		ISymbolSeq returned1 = subseq1.getSymbolSubseq(values);
+		ISymbolSeq returned2 = subseq2.getSymbolSubseq(values);
+		ISymbolSeq returned3 = subseq3.getSymbolSubseq(values);
 		System.out.println("subseq1 : " + returned1.toString() + System.lineSeparator() 
 			+ "subseq1 expected : " + expected1.toString());
 		System.out.println("subseq2 : " + returned2.toString() + System.lineSeparator() 
