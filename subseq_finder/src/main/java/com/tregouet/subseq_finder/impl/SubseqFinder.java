@@ -40,6 +40,25 @@ public class SubseqFinder implements ISubseqFinder {
 		setCoordSubsequences();
 		setMaxCommonSubseq();
 	}
+	
+	public SubseqFinder(List<List<String>> paramSeq) throws SubseqException {
+		this.sequences = new String[paramSeq.size()][];
+		for (int i = 0 ; i < paramSeq.size() ; i++) {
+			List<String> iSequence = paramSeq.get(i);
+			this.sequences[i] = iSequence.toArray(new String[iSequence.size()]);
+		}
+		try {
+			testParameterValidity(sequences);
+		} catch (Exception e) {
+			throw new SubseqException("SubseqFinder(String[][]) : " + System.lineSeparator() + e.getMessage());
+		}
+		subseqMaxSize = setSubseqMaxSize();
+		setSimilarities();
+		setSuccessorRelation();
+		setCoordSubsequenceSeeds();
+		setCoordSubsequences();
+		setMaxCommonSubseq();
+	}	
 
 	public Set<ICoordSubseq> getCoordSubseqs() {
 		return coordSubsequences;
