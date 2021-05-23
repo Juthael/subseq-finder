@@ -1,4 +1,4 @@
-package com.tregouet.subseq_finder.impl;
+package com.tregouet.subseq_finder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.tregouet.subseq_finder.ISubseqFinder;
-import com.tregouet.subseq_finder.ISymbolSeq;
 import com.tregouet.subseq_finder.exceptions.SubseqException;
+import com.tregouet.subseq_finder.impl.SubseqFinder;
 
 public class TryMe {
 
