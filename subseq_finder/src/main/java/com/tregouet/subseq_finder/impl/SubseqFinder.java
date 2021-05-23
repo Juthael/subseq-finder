@@ -204,4 +204,11 @@ public class SubseqFinder implements ISubseqFinder {
 		else return false;
 	}
 
+	public Set<List<String>> getMaxCommonStrings() {
+		Set<List<String>> maxCommonStrings = new HashSet<List<String>>();
+		for (ISymbolSeq seq : maxCommonSubseqs)
+			maxCommonStrings.add(seq.getStringSequence());
+		return maxCommonStrings;
+	}
+
 }

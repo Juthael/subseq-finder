@@ -1,5 +1,6 @@
 package com.tregouet.subseq_finder;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,5 +52,7 @@ public interface ISubseqFinder {
 	 * @return all maximal common subsequences, as lists of symbols with placeholders symbols inserted where needed 
 	 */
 	public Set<ISymbolSeq> getMaxCommonSubseqs();
+	
+	public Set<List<String>> getMaxCommonStrings();
 
 }
