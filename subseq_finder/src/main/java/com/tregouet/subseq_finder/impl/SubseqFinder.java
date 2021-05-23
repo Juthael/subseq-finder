@@ -39,18 +39,19 @@ public class SubseqFinder implements ISubseqFinder {
 		setCoordSubsequenceSeeds();
 		setCoordSubsequences();
 		setMaxCommonSubseq();
-	}
+	}	
 	
-	public SubseqFinder(List<List<String>> paramSeq) throws SubseqException {
-		this.sequences = new String[paramSeq.size()][];
-		for (int i = 0 ; i < paramSeq.size() ; i++) {
-			List<String> iSequence = paramSeq.get(i);
+	public SubseqFinder(List<ISymbolSeq> symbolSeqs) {
+		this.sequences = new String[symbolSeqs.size()][];
+		for (int i = 0 ; i < symbolSeqs.size() ; i++) {
+			List<String> iSequence = symbolSeqs.get(i).getStringSequence();
 			this.sequences[i] = iSequence.toArray(new String[iSequence.size()]);
 		}
 		try {
 			testParameterValidity(sequences);
 		} catch (Exception e) {
-			throw new SubseqException("SubseqFinder(String[][]) : " + System.lineSeparator() + e.getMessage());
+			System.out.println("SubseqFinder(String[][]) : " + System.lineSeparator() + e.getMessage());
+			System.exit(0);
 		}
 		subseqMaxSize = setSubseqMaxSize();
 		setSimilarities();
@@ -58,7 +59,7 @@ public class SubseqFinder implements ISubseqFinder {
 		setCoordSubsequenceSeeds();
 		setCoordSubsequences();
 		setMaxCommonSubseq();
-	}	
+	}
 
 	public Set<ICoordSubseq> getCoordSubseqs() {
 		return coordSubsequences;
@@ -187,11 +188,11 @@ public class SubseqFinder implements ISubseqFinder {
 	
 	private void testParameterValidity(String[][] sequences) throws SubseqException {
 		if ((sequences == null) || (sequences.length < 2))
-			throw new SubseqException("SubseqFinderPOS.setParameterValidity(int[][]) : parameter cannot be null nor "
+			throw new SubseqException("SubseqFinder.setParameterValidity(int[][]) : parameter cannot be null nor "
 					+ "of length < 2");
 		for (int i=0 ; i < sequences.length ; i++) {
 			if (sequences[i].length == 0)
-				throw new SubseqException("SubseqFinderPOS.setParameterValidity(int[][]) : "
+				throw new SubseqException("SubseqFinder.setParameterValidity(int[][]) : "
 						+ "compared sequences cannot be empty");
 		}
 	}

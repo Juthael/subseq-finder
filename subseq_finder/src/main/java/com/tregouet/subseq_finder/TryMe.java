@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.tregouet.subseq_finder.exceptions.SubseqException;
 import com.tregouet.subseq_finder.impl.SubseqFinder;
+import com.tregouet.subseq_finder.impl.SymbolSeq;
 
 public class TryMe {
 
@@ -29,7 +30,10 @@ public class TryMe {
 			System.out.println(System.lineSeparator() + "Enter another chain of symbols separated by spaces, or press ENTER");
 			input = readString();
 		}
-		ISubseqFinder sFinder = new SubseqFinder(inputs);
+		List<ISymbolSeq> param = new ArrayList<ISymbolSeq>();
+		for (List<String> currInput : inputs)
+			param.add(new SymbolSeq(currInput));
+		ISubseqFinder sFinder = new SubseqFinder(param);
 		System.out.println("Maximal common subsequences :");
 		for (ISymbolSeq seq : sFinder.getMaxCommonSubseqs())
 			System.out.println(seq.toString());
