@@ -64,21 +64,18 @@ public class SymbolSeq implements ISymbolSeq {
 	}
 	
 	private boolean isSubsetOf(ISymbolSeq seq1, ISymbolSeq seq2) {
-		boolean subsetOf = false;
 		if (seq1.length() < seq2.length()) {
-			Iterator<String> shortestIte = seq1.getStringSequence().iterator();
-			Iterator<String> longestIte = seq2.getStringSequence().iterator();
-			String shortestNextSymbol = shortestIte.next();
-			String longestNextSymbol;
-			while (shortestIte.hasNext() && longestIte.hasNext()) {
-				longestNextSymbol = longestIte.next();
-				if (longestNextSymbol.equals(shortestNextSymbol))
-					shortestNextSymbol = shortestIte.next();
+			Iterator<String> iteOverLongest = seq2.getStringSequence().iterator();
+			for (String shortestSeqSym : seq1.getStringSequence()) {
+				if (!iteOverLongest.hasNext())
+					return false;
+				while (iteOverLongest.hasNext() && !iteOverLongest.next().equals(shortestSeqSym)) {
+					//do nothing
+				}
 			}
-			if (!shortestIte.hasNext())
-				subsetOf = true;	
+			return true;
 		}
-		return subsetOf;
+		else return false;
 	}
 	
 	@Override
