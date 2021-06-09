@@ -26,21 +26,6 @@ public class SubseqFinder implements ISubseqFinder {
 	private final Map<Similarity, Set<Similarity>> succRelation = new HashMap<Similarity, Set<Similarity>>();
 	private final Set<Similarity> coordSeqSeeds = new HashSet<Similarity>();
 	
-	public SubseqFinder(String[][] sequences) throws SubseqException {
-		try {
-			testParameterValidity(sequences);
-		} catch (Exception e) {
-			throw new SubseqException("SubseqFinder(String[][]) : " + System.lineSeparator() + e.getMessage());
-		}
-		this.sequences = sequences;
-		subseqMaxSize = setSubseqMaxSize();
-		setSimilarities();
-		setSuccessorRelation();
-		setCoordSubsequenceSeeds();
-		setCoordSubsequences();
-		setMaxCommonSubseq();
-	}	
-	
 	public SubseqFinder(List<ISymbolSeq> symbolSeqs) {
 		this.sequences = new String[symbolSeqs.size()][];
 		for (int i = 0 ; i < symbolSeqs.size() ; i++) {
@@ -59,12 +44,34 @@ public class SubseqFinder implements ISubseqFinder {
 		setCoordSubsequenceSeeds();
 		setCoordSubsequences();
 		setMaxCommonSubseq();
+	}	
+	
+	public SubseqFinder(String[][] sequences) throws SubseqException {
+		try {
+			testParameterValidity(sequences);
+		} catch (Exception e) {
+			throw new SubseqException("SubseqFinder(String[][]) : " + System.lineSeparator() + e.getMessage());
+		}
+		this.sequences = sequences;
+		subseqMaxSize = setSubseqMaxSize();
+		setSimilarities();
+		setSuccessorRelation();
+		setCoordSubsequenceSeeds();
+		setCoordSubsequences();
+		setMaxCommonSubseq();
 	}
 
 	public Set<ICoordSubseq> getCoordSubseqs() {
 		return coordSubsequences;
 	}
 
+	public Set<List<String>> getMaxCommonStrings() {
+		Set<List<String>> maxCommonStrings = new HashSet<List<String>>();
+		for (ISymbolSeq seq : maxCommonSubseqs)
+			maxCommonStrings.add(seq.getStringSequence());
+		return maxCommonStrings;
+	}
+	
 	public Set<ISymbolSeq> getMaxCommonSubseqs() {
 		return maxCommonSubseqs;
 	}
@@ -84,7 +91,7 @@ public class SubseqFinder implements ISubseqFinder {
 				continueSubsequence(coordSubseq, nextSim);
 			}
 		}
-	}
+	}	
 	
 	private void setCoordSubsequences() {
 		for (Similarity seed : coordSeqSeeds) {
@@ -99,7 +106,7 @@ public class SubseqFinder implements ISubseqFinder {
 					continueSubsequence(newSubseq, next);
 			}
 		}
-	}	
+	}
 	
 	private void setCoordSubsequenceSeeds() {
 		coordSeqSeeds.addAll(similarities);
@@ -196,20 +203,13 @@ public class SubseqFinder implements ISubseqFinder {
 						+ "compared sequences cannot be empty");
 		}
 	}
-	
+
 	private boolean testSimilarity(int[] coords, int seqIdx) {
 		if (seqIdx != -1) {
 			String refSymbol = sequences[0][coords[0]];
 			return refSymbol.equals(sequences[seqIdx][coords[seqIdx]]);
 		}
 		else return false;
-	}
-
-	public Set<List<String>> getMaxCommonStrings() {
-		Set<List<String>> maxCommonStrings = new HashSet<List<String>>();
-		for (ISymbolSeq seq : maxCommonSubseqs)
-			maxCommonStrings.add(seq.getStringSequence());
-		return maxCommonStrings;
 	}
 
 }

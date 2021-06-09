@@ -1,6 +1,5 @@
 package com.tregouet.subseq_finder.impl;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.tregouet.subseq_finder.ISymbolSeq;
@@ -9,10 +8,15 @@ public class SymbolSeq implements ISymbolSeq {
 
 	private List<String> sequence;
 	private int length;
+	private int lengthWithoutPlaceHolders = 0;
 	
 	public SymbolSeq(List<String> sequence) {
 		this.sequence = sequence;
 		length = sequence.size();
+		for (String symbol : sequence) {
+			if (!symbol.equals(ISymbolSeq.PLACEHOLDER))
+				lengthWithoutPlaceHolders++;
+		}
 	}
 
 	public Integer compareTo(ISymbolSeq other) {
@@ -46,6 +50,10 @@ public class SymbolSeq implements ISymbolSeq {
 	public List<String> getStringSequence() {
 		return sequence;
 	}
+	
+	public String[] getStringArray() {
+		return sequence.toArray(new String[sequence.size()]);
+	}
 
 	@Override
 	public int hashCode() {
@@ -63,24 +71,36 @@ public class SymbolSeq implements ISymbolSeq {
 		return length;
 	}
 	
-	private boolean isSubsetOf(ISymbolSeq seq1, ISymbolSeq seq2) {
-		if (seq1.length() < seq2.length()) {
-			Iterator<String> iteOverLongest = seq2.getStringSequence().iterator();
-			for (String shortestSeqSym : seq1.getStringSequence()) {
-				if (!iteOverLongest.hasNext())
-					return false;
-				while (iteOverLongest.hasNext() && !iteOverLongest.next().equals(shortestSeqSym)) {
-					//do nothing
-				}
-			}
-			return true;
-		}
-		else return false;
+	public int lengthWithoutPlaceholders() {
+		return lengthWithoutPlaceHolders;
 	}
 	
 	@Override
 	public String toString() {
-		return sequence.toString();
+		StringBuilder sB = new StringBuilder();
+		for (int i = 0 ; i < length ; i++){
+			sB.append(sequence.get(i));
+			if (i < length - 1)
+				sB.append(" ");
+		}
+		return sB.toString();
+	}
+	
+	private boolean isSubsetOf(ISymbolSeq seq1, ISymbolSeq seq2) {
+		if (seq1.lengthWithoutPlaceholders() < seq2.lengthWithoutPlaceholders()) {
+			List<String> sequence1 = seq1.getStringSequence();
+			List<String> sequence2 = seq2.getStringSequence();
+			int seq1Idx = 0;
+			for (int seq2Idx = 0 ; (seq2Idx < sequence2.size()) && (seq1Idx < sequence1.size()) ; seq2Idx++) {
+				while (seq1Idx < sequence1.size() && sequence1.get(seq1Idx).equals(ISymbolSeq.PLACEHOLDER))
+					seq1Idx++;
+				if (seq1Idx < sequence1.size() && sequence2.get(seq2Idx).equals(sequence1.get(seq1Idx)))
+					seq1Idx++;
+			}
+			if (seq1Idx == sequence1.size())
+				return true;
+		}
+		return false;
 	}
 
 }

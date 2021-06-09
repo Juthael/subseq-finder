@@ -16,7 +16,7 @@ public interface ISymbolSeq {
 	public static final Integer SUBSEQ_OF = -1;
 	public static final Integer EQUAL_TO = 0;
 	public static final Integer SUPERSEQ_OF = 1;
-	public static final Integer NOT_COMPARABLE = null;
+	public static final Integer NOT_COMPARABLE = -2;
 	
 	/**
 	 * Note : ordering on ISymbolSeq instances is partial, so this is not an implementation of the {@link Comparable} 
@@ -46,18 +46,26 @@ public interface ISymbolSeq {
 	 * 
 	 * @return
 	 */
-	public List<String> getStringSequence();
+	List<String> getStringSequence();
+	
+	String[] getStringArray();
 	
 	/**
 	 * 
 	 * @return 'true' if this sequence contains a placeholder symbol. 
 	 */
-	public boolean isAbstract();
+	boolean isAbstract();
 	
 	/**
 	 * 
 	 * @return the sequence length.
 	 */
-	public int length();
+	int length();
+	
+	/**
+	 * 
+	 * @return the sequence length without placeholders
+	 */
+	int lengthWithoutPlaceholders();
 
 }
