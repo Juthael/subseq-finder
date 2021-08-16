@@ -43,9 +43,11 @@ public class CoordinatesTest {
 			similar = test(coords, seqIdx);
 			if (seqIdx != -1) {
 				int[] posTested = Arrays.copyOfRange(coords, 0, seqIdx +1);
+				/*
 				System.out.println("Pos tested : " + Arrays.toString(posTested));
 				System.out.println("Pos expected : " + Arrays.toString(expectedVisitedCoords[expectationIndex]));
 				System.out.println(System.lineSeparator());
+				*/
 				if (!Arrays.equals(posTested, expectedVisitedCoords[expectationIndex]))
 					asExpected = false;
 				expectationIndex++;

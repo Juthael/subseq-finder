@@ -53,12 +53,14 @@ public class CoordSubseqTest {
 		ISymbolSeq returned1 = subseq1.getSymbolSubseq(values);
 		ISymbolSeq returned2 = subseq2.getSymbolSubseq(values);
 		ISymbolSeq returned3 = subseq3.getSymbolSubseq(values);
+		/*
 		System.out.println("subseq1 : " + returned1.toString() + System.lineSeparator() 
 			+ "subseq1 expected : " + expected1.toString());
 		System.out.println("subseq2 : " + returned2.toString() + System.lineSeparator() 
 		+ "subseq2 expected : " + expected2.toString());
 		System.out.println("subseq3 : " + returned3.toString() + System.lineSeparator() 
 		+ "subseq3 expected : " + expected3.toString());
+		*/
 		assertTrue(expected1.equals(returned1) && expected2.equals(returned2) && expected3.equals(returned3));
 	}
 	
