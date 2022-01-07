@@ -1,13 +1,11 @@
 package com.tregouet.subseq_finder.impl.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import com.tregouet.subseq_finder.impl.utils.Coordinates;
 
 public class CoordinatesTest {
 
