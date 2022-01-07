@@ -19,7 +19,7 @@ public class CoordinatesTest {
 		sequences[0] = abc;
 		sequences[1] = adbec;
 		sequences[2] = jabc;
-	}
+	} //
 
 	@Test
 	public void whenNewtCoordinateRequestedThenAsExpected() {
