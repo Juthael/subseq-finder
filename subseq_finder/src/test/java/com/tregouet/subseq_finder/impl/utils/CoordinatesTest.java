@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class CoordinatesTest {
 
-	String[][] sequences = new String[3][]; //
+	String[][] sequences = new String[3][];
 	
 	@Before
 	public void setUp() throws Exception {
